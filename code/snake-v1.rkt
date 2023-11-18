@@ -17,7 +17,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; IMAGES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; App background
-(define Background (empty-scene 1000 1000))
+(define Background (empty-scene 500 500))
 
 
 ; a SnakeUnit is an Image
@@ -106,7 +106,7 @@
 
 (define-struct snake [position length direction])
 
-(define SnakeDefault (make-snake (make-posn -26 -26) 3 Right))
+(define SnakeDefault (make-snake (make-posn -225 -225) 3 Right))
 (define Snake1 (make-snake (make-posn -26 -26) 3 Up))
 (define Snake2 (make-snake (make-posn -26 -26) 4 Down))
 (define Snake3 (make-snake (make-posn -26 -52) 5 Left))
@@ -178,6 +178,18 @@
 ; draw the snake and the apple's position on the background
 
 
+;(define (draw state)
+;  (overlay/xy AppleUnit -1 -1 (overlay/xy SnakeUnit -1 -1 Background)))
+
+(define (draw state)
+  (overlay/xy AppleUnit (posn-x Apple2) (posn-y Apple2) (overlay/xy SnakeUnit (x-cord (appstate-snake state)) (y-cord (appstate-snake state)) Background)))
+
+(define (x-cord snake)
+  (posn-x (snake-position snake)))
+
+(define (y-cord snake)
+  (posn-y (snake-position snake)))
+
 
 ;;;;;;;;;;;;;;;;;;;; TICK ;;;;;;;;;;;;;;;;;;;;
 
@@ -199,20 +211,20 @@
 ; - Any   : return the prevoius AppState
 
 ; Example
-(check-expect (handle-keyboard "up" E2) (make-appstate (make-snake (make-posn -26 -26) 4 Up) Apple1 Game_t quit_f))
-(check-expect (handle-keyboard "right" E1) (make-appstate (make-snake (make-posn -26 -26) 3 Right) Apple1 Game_t quit_f))
-(check-expect (handle-keyboard "down" E1) (make-appstate (make-snake (make-posn -26 -26) 3 Down) Apple1 Game_t quit_f))
-(check-expect (handle-keyboard "left" E1) (make-appstate (make-snake (make-posn -26 -26) 3 Left) Apple1 Game_t quit_f))
-(check-expect (handle-keyboard "r" E1) EDefault)
-(check-expect (handle-keyboard "/escape" E1) #false)
-(check-expect (handle-keyboard "/escape" E7) #true)
-(check-expect (handle-keyboard "" E1) E1)
-(check-expect (handle-keyboard " " E1) E1)
-(check-expect (handle-keyboard "ciao" E1) E1)
-(check-expect (handle-keyboard "b" E1) E1)
-(check-expect (handle-keyboard #false E1) E1)
-(check-expect (handle-keyboard #true E1) E1)
-(check-expect (handle-keyboard 2 E1) E1)
+(check-expect (handle-keyboard E2 "up") (make-appstate (make-snake (make-posn -26 -26) 4 Up) Apple1 Game_t quit_f))
+(check-expect (handle-keyboard E1 "right") (make-appstate (make-snake (make-posn -26 -26) 3 Right) Apple1 Game_t quit_f))
+(check-expect (handle-keyboard E1 "down") (make-appstate (make-snake (make-posn -26 -26) 3 Down) Apple1 Game_t quit_f))
+(check-expect (handle-keyboard E1 "left") (make-appstate (make-snake (make-posn -26 -26) 3 Left) Apple1 Game_t quit_f))
+(check-expect (handle-keyboard E1 "r") EDefault)
+(check-expect (handle-keyboard E1 "escape") #false)
+(check-expect (handle-keyboard E7 "escape") #true)
+(check-expect (handle-keyboard E1 "") E1)
+(check-expect (handle-keyboard E1 " ") E1)
+(check-expect (handle-keyboard E1 "ciao") E1)
+(check-expect (handle-keyboard E1 "b") E1)
+(check-expect (handle-keyboard E1 #false) E1)
+(check-expect (handle-keyboard E1 #true) E1)
+(check-expect (handle-keyboard E1 2) E1)
 
 ; Template
 ;(define (handle-mouse key state)
@@ -227,7 +239,7 @@
 ;    [else ... state ...]))
 
 ; Code
-(define (handle-keyboard key state)
+(define (handle-keyboard state key)
   (cond
     [(not (string? key)) state]                                  ; for any possible not-key input which are not a string, the output is the same AppState as before
     [(string=? key "up") (change-snake-direction key state)]     ; change the direction to up
@@ -235,7 +247,7 @@
     [(string=? key "down") (change-snake-direction key state)]   ; change the direction to down
     [(string=? key "left") (change-snake-direction key state)]   ; change the direction to left
     [(string=? key "r") (reset state)]                           ; reset the game
-    [(string=? key "/escape") (end? state)]                      ; quit the game
+    [(string=? key "escape") (quit? state)]                       ; quit the game
     [else state]))                                               ; for any possible not-key input which are a string, the output is the same AppState as before
 
 
@@ -306,16 +318,12 @@
 ; Header (define (end? state) #false)
 
 ; Examples
-;(check-expect (reset E1) E1)
-;(check-expect (reset E2) E2)
-;(check-expect (reset E3) E3)
-;(check-expect (reset E4) E4)
-;(check-expect (reset E5) E5)
 (check-expect (reset E1) EDefault)
 (check-expect (reset E2) EDefault)
 (check-expect (reset E3) EDefault)
 (check-expect (reset E4) EDefault)
 (check-expect (reset E5) EDefault)
+(check-expect (reset E6) E6)
 
 ; Template
 ;(define (reset state)
@@ -326,8 +334,8 @@
 ; Code
 (define (reset state)
   (cond
-    [(boolean=? (appstate-quit state) #true) state] ; the game continue to run
-    [else EDefault]))                               ; the game is reseted
+    [(boolean=? (appstate-game state) #true) EDefault] ; the game continue to run
+    [else state]))                               ; the game is reseted
 
 
 
@@ -339,16 +347,16 @@
 ; Header (define (end? state) #false)
 
 ; Examples
-(check-expect (end? E1) #false)
-(check-expect (end? E2) #false)
-(check-expect (end? E3) #false)
-(check-expect (end? E4) #false)
-(check-expect (end? E5) #false)
-(check-expect (end? (make-appstate Snake1 Apple1 Game_t quit_t)) #true)
-(check-expect (end? (make-appstate Snake2 Apple1 Game_t quit_t)) #true)
-(check-expect (end? (make-appstate Snake3 Apple1 Game_t quit_t)) #true)
-(check-expect (end? (make-appstate Snake4 Apple1 Game_t quit_t)) #true)
-(check-expect (end? (make-appstate Snake5 Apple1 Game_t quit_t)) #true)
+(check-expect (quit? E1) #false)
+(check-expect (quit? E2) #false)
+(check-expect (quit? E3) #false)
+(check-expect (quit? E4) #false)
+(check-expect (quit? E5) #false)
+(check-expect (quit? (make-appstate Snake1 Apple1 Game_t quit_t)) #true)
+(check-expect (quit? (make-appstate Snake2 Apple1 Game_t quit_t)) #true)
+(check-expect (quit? (make-appstate Snake3 Apple1 Game_t quit_t)) #true)
+(check-expect (quit? (make-appstate Snake4 Apple1 Game_t quit_t)) #true)
+(check-expect (quit? (make-appstate Snake5 Apple1 Game_t quit_t)) #true)
 
 
 ; Template
@@ -358,7 +366,7 @@
 ;    [else ... state ...]))
 
 ; Code
-(define (end? state)
+(define (quit? state)
   (cond
     [(boolean=? (appstate-quit state) #false) #false] ; the application remains on
     [else #true]))                                    ; the application turn off
@@ -366,11 +374,12 @@
 
 
 
+
 ;;;;;;;;;;;;;;;;;;;; MAIN APPLICATION ;;;;;;;;;;;;;;;;;;;;
 
-;(define (snake-game AppState)
-;  (big-bang AppState
-;    [to-draw draw]             ; draw the snake
+(define (snake-game AppState)
+  (big-bang AppState
+    [to-draw draw]             ; draw the snake
 ;    [on-tick move-snake time]  ; uptade snake's position and "time" incrase each tick
-;    [on-key handle-keyboard]   ; change snake's direction or reset game or quit the game
-;    [stop-when end?]))         ; quit the application
+    [on-key handle-keyboard]   ; change snake's direction or reset game or quit the game
+    [stop-when quit?]))         ; quit the application
