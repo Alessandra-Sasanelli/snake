@@ -19,10 +19,28 @@
 ; App background
 (define Background (empty-scene 500 500 "black"))
 
+;(define Snake_back (rectangle 74 24 "solid" "white"))
+
 
 ; a SnakeUnit is an Image
 ; It represents the little rectangles that the snake is made off
 (define SnakeUnit (rectangle 24 24 "solid" "green"))
+
+; a Snake_head is an Image
+; It represents the head of the snake with 'eye' and 'tongue'
+; eye
+(define eye (circle 3 "solid" "black"))
+
+; tounge
+(define tongue (rectangle 3 10 "solid" "red"))
+
+; head
+(define Snake_head (place-image eye 7 12 (place-image eye 17 12 (place-image tongue 12 3 SnakeUnit))))
+
+; a Snake_default is an Image
+; It represents the default snake at the beginning of the game
+(define Snake_default (overlay/xy (rotate -90 Snake_head) -225 -225 (overlay/xy SnakeUnit -200 -225 (overlay/xy SnakeUnit -175 -225 Background))))
+;(define Snake_default_2 (overlay/xy (rotate -90 Snake_head) -50 0 (overlay/xy SnakeUnit -25 0 (overlay/xy SnakeUnit 0 0 Snake_back))))
 
 ; a AppleUnit is an Image
 ; It represents the little rectangles that the apple is made off
@@ -121,7 +139,7 @@
 ; it represents the position of the apple at a particular moment
 
 (define Apple1 (make-posn -26 -26))
-(define Apple2 (make-posn -1 -26))
+(define Apple2 (make-posn -1 -25))
 
 
 
@@ -181,8 +199,12 @@
 ;(define (draw state)
 ;  (overlay/xy AppleUnit -1 -1 (overlay/xy SnakeUnit -1 -1 Background)))
 
+;(define (draw state)
+;  (overlay/xy AppleUnit (posn-x Apple2) (posn-y Apple2) (overlay/xy Snake_default (x-cord (appstate-snake state)) (y-cord (appstate-snake state)) Background)))
+
+
 (define (draw state)
-  (overlay/xy AppleUnit (posn-x Apple2) (posn-y Apple2) (overlay/xy SnakeUnit (x-cord (appstate-snake state)) (y-cord (appstate-snake state)) Background)))
+  (overlay/xy AppleUnit (posn-x Apple2) (- (posn-y Apple2) 1) (overlay/xy SnakeUnit (x-cord (appstate-snake state)) (y-cord (appstate-snake state)) Background)))
 
 (define (x-cord snake)
   (posn-x (snake-position snake)))
@@ -190,11 +212,6 @@
 (define (y-cord snake)
   (posn-y (snake-position snake)))
 
-
-;;;;;;;;;;;;;;;;;;;; TICK ;;;;;;;;;;;;;;;;;;;;
-
-; tick : AppState Number -> Number
-; change the position of the snake and apple's position, if it was eaten by snake, and the tick is become faster and faster every time the snake eats an apple
 
 
 
@@ -366,7 +383,43 @@
 
 
 
-;;;;;;;;;; END ;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;; TICK ;;;;;;;;;;;;;;;;;;;;
+
+; tick : AppState Number -> Number
+; change the position of the snake and apple's position, if it was eaten by snake, and the tick is become faster and faster every time the snake eats an apple
+
+; sto lavorando a questo e credo di saperlo fare, lo finisco quando torno, se vuoi andare avanti fai pure, il trick sta nel creare un nuovo appstate con le coordinate aggiornate
+(define (move-snake state)
+  (cond
+    [(string=? (snake-direction (appstate-snake state)) "up") (moving-up (appstate-snake state))]
+    [(string=? (snake-direction (appstate-snake state)) "right") (moving-right (appstate-snake state))]
+    [(string=? (snake-direction (appstate-snake state)) "down") (moving-down (appstate-snake state))]
+    [(string=? (snake-direction (appstate-snake state)) "left") (moving-left (appstate-snake state))]))
+
+
+(define (moving-up snake)
+  (make-snake (make-posn (posn-x (snake-position snake)) (+ (posn-y (snake-position snake)) 25)) (snake-length snake) (snake-direction snake)))
+
+(define (moving-right snake)
+  (make-posn (- (posn-x (snake-position snake)) 25) (posn-y (snake-position snake))))
+
+(define (moving-down snake)
+  (make-posn (posn-x (snake-position snake)) (- (posn-y (snake-position snake)) 25)))
+
+(define (moving-left snake)
+  (make-posn (- (posn-x (snake-position snake)) 25) (posn-y (snake-position snake))))
+
+
+(define (time-tick state)
+  (cond
+    [(< (snake-length (appstate-snake state)) 10) 1.5]
+    [(< 10 (snake-length (appstate-snake state)) 15) 1]
+    [(>= (snake-length (appstate-snake state)) 15) (* (snake-length (appstate-snake state)) 0.10)]))
+
+
+;;;;;;;;;;;;;;;;;;;; END ;;;;;;;;;;;;;;;;;;;;
 
 ; a end? is a Boolean
 ; end? : AppState -> Boolean
@@ -407,6 +460,6 @@
 (define (snake-game AppState)
   (big-bang AppState
     [to-draw draw]             ; draw the snake
-;    [on-tick move-snake time]  ; uptade snake's position and "time" incrase each tick
     [on-key handle-keyboard]   ; change snake's direction or reset game or quit the game
+    [on-tick move-snake 1]  ; uptade snake's position and "time" incrase each tick
     [stop-when end?]))         ; quit the application
