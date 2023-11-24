@@ -3,8 +3,8 @@
 #reader(lib "htdp-intermediate-reader.ss" "lang")((modname snake-v1) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; CODE STANDARDS ;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; - Constants always UPPERCASE
-; - Functions always Capitalize
+; - Constants always all UPPERCASE
+; - Functions always all LOWERCASE
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LIBRARIES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -16,35 +16,38 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; IMAGES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; App background
-(define Background (empty-scene 500 500 "black"))
+; App BACKGROUND
+(define BACKGROUND (empty-scene 500 500 "black"))
 
 ;(define Snake_back (rectangle 74 24 "solid" "white"))
 
 
 ; a SnakeUnit is an Image
 ; It represents the little rectangles that the snake is made off
-(define SnakeUnit (rectangle 24 24 "solid" "green"))
+(define SNAKEUNIT (rectangle 24 24 "solid" "green"))
 
-; a Snake_head is an Image
-; It represents the head of the snake with 'eye' and 'tongue'
-; eye
-(define eye (circle 3 "solid" "black"))
+; a SnakeHead is an Image
+; It represents the head of the snake with 'EYE' and 'TONGUE'
+; EYE
+(define EYE (circle 3 "solid" "black"))
 
 ; tounge
-(define tongue (rectangle 3 10 "solid" "red"))
+(define TONGUE (rectangle 3 10 "solid" "red"))
 
 ; head
-(define Snake_head (place-image eye 7 12 (place-image eye 17 12 (place-image tongue 12 3 SnakeUnit))))
+(define SNAKEHEAD (place-image EYE 7 12 (place-image EYE 17 12 (place-image TONGUE 12 3 SNAKEUNIT))))
 
-; a Snake_default is an Image
+; a SnakeDefault is an Image
 ; It represents the default snake at the beginning of the game
-(define Snake_default (overlay/xy (rotate -90 Snake_head) -225 -225 (overlay/xy SnakeUnit -200 -225 (overlay/xy SnakeUnit -175 -225 Background))))
-;(define Snake_default_2 (overlay/xy (rotate -90 Snake_head) -50 0 (overlay/xy SnakeUnit -25 0 (overlay/xy SnakeUnit 0 0 Snake_back))))
+(define Snake_default (overlay/xy (rotate -90 SNAKEHEAD) -225 -225 (overlay/xy SNAKEUNIT -200 -225 (overlay/xy SNAKEUNIT -175 -225 BACKGROUND))))
+;(define Snake_default_2 (overlay/xy (rotate -90 SNAKEHEAD) -50 0 (overlay/xy SNAKEUNIT -25 0 (overlay/xy SNAKEUNIT 0 0 Snake_back))))
+;; Simo, io non sono convinta di questa definizione, nel senso che, SnakeDefault non ha senso definirlo come un data type...
+;; d'altronde questo e solo uno stato del serpente, quindi e gia compreso nello struct per lo snake.
 
-; a AppleUnit is an Image
+
+; a APPLEUNIT is an Image
 ; It represents the little rectangles that the apple is made off
-(define AppleUnit (rectangle 24 24 "solid" "red"))
+(define APPLEUNIT (rectangle 24 24 "solid" "red"))
 
 
 
@@ -55,7 +58,7 @@
 
 ;;;;;;;;;; POSITION ;;;;;;;;;;
 
-; a Position is Posn as such:
+; a Position is a Posn as such:
 ; - (make-posn -1 -1)
 ; - (make-posn (- (posn-x Position) 25) (- (posn-y Position) 25))
 ; represents the position of a element of the snake
@@ -177,7 +180,7 @@
 
 (define-struct appstate [snake apple game quit])
 
-(define Default (make-appstate SnakeDefault Apple1 Game_t quit_f))
+(define DAFAULT (make-appstate SnakeDefault Apple1 Game_t quit_f))
 (define E1 (make-appstate Snake1 Apple1 Game_t quit_f))
 (define E2 (make-appstate Snake2 Apple1 Game_t quit_f))
 (define E3 (make-appstate Snake3 Apple1 Game_t quit_f))
@@ -187,24 +190,21 @@
 (define E7 (make-appstate Snake1 Apple1 Game_t quit_t))
 
 
-
-
-
 ;;;;;;;;;;;;;;;;;;;; DRAW ;;;;;;;;;;;;;;;;;;;;
 
 ; draw : AppState -> AppState
-; draw the snake and the apple's position on the background
+; draw the snake and the apple's position on the BACKGROUND
 
 
 ;(define (draw state)
-;  (overlay/xy AppleUnit -1 -1 (overlay/xy SnakeUnit -1 -1 Background)))
+;  (overlay/xy APPLEUNIT -1 -1 (overlay/xy SNAKEUNIT -1 -1 BACKGROUND)))
 
 ;(define (draw state)
-;  (overlay/xy AppleUnit (posn-x Apple2) (posn-y Apple2) (overlay/xy Snake_default (x-cord (appstate-snake state)) (y-cord (appstate-snake state)) Background)))
+;  (overlay/xy APPLEUNIT (posn-x Apple2) (posn-y Apple2) (overlay/xy Snake_default (x-cord (appstate-snake state)) (y-cord (appstate-snake state)) BACKGROUND)))
 
 
 (define (draw state)
-  (overlay/xy AppleUnit (posn-x Apple2) (- (posn-y Apple2) 1) (overlay/xy SnakeUnit (x-cord (appstate-snake state)) (y-cord (appstate-snake state)) Background)))
+  (overlay/xy APPLEUNIT (posn-x Apple2) (- (posn-y Apple2) 1) (overlay/xy SNAKEUNIT (x-cord (appstate-snake state)) (y-cord (appstate-snake state)) BACKGROUND)))
 
 (define (x-cord snake)
   (posn-x (snake-position snake)))
@@ -232,7 +232,7 @@
 (check-expect (handle-keyboard E1 "right") (make-appstate (make-snake (make-posn -26 -26) 3 Right) Apple1 Game_t quit_f))
 (check-expect (handle-keyboard E1 "down") (make-appstate (make-snake (make-posn -26 -26) 3 Down) Apple1 Game_t quit_f))
 (check-expect (handle-keyboard E1 "left") (make-appstate (make-snake (make-posn -26 -26) 3 Left) Apple1 Game_t quit_f))
-(check-expect (handle-keyboard E1 "r") Default)
+(check-expect (handle-keyboard E1 "r") DEFAULT)
 (check-expect (handle-keyboard E1 "escape") E7)
 (check-expect (handle-keyboard E7 "escape") E7)
 (check-expect (handle-keyboard E1 "") E1)
@@ -336,11 +336,11 @@
 ; Header (define (end? state) #false)
 
 ; Examples
-(check-expect (reset E1) Default)
-(check-expect (reset E2) Default)
-(check-expect (reset E3) Default)
-(check-expect (reset E4) Default)
-(check-expect (reset E5) Default)
+(check-expect (reset E1) DEFAULT)
+(check-expect (reset E2) DEFAULT)
+(check-expect (reset E3) DEFAULT)
+(check-expect (reset E4) DEFAULT)
+(check-expect (reset E5) DEFAULT)
 (check-expect (reset E6) E6)
 
 ; Template
@@ -430,26 +430,34 @@
 ; Code
 (define (move-snake state)
   (cond
-    [(string=? (snake-direction (appstate-snake state)) "up") (make-appstate
-                                                               (update-moving (appstate-snake state)) ; call the fuction to move the snake to up
-                                                               (appstate-apple state)                 ; apple is the same
-                                                               (appstate-game state)                  ; game is the same
-                                                               (appstate-quit state))]                ; quit is the same
-    [(string=? (snake-direction (appstate-snake state)) "right") (make-appstate
-                                                               (update-moving (appstate-snake state)) ; call the fuction to move the snake to right
-                                                               (appstate-apple state)                 ; apple is the same
-                                                               (appstate-game state)                  ; game is the same
-                                                               (appstate-quit state))]                ; quit is the same
-    [(string=? (snake-direction (appstate-snake state)) "down") (make-appstate
-                                                               (update-moving (appstate-snake state)) ; call the fuction to move the snake to down
-                                                               (appstate-apple state)                 ; apple is the same
-                                                               (appstate-game state)                  ; game is the same
-                                                               (appstate-quit state))]                ; quit is the same
-    [(string=? (snake-direction (appstate-snake state)) "left") (make-appstate
-                                                               (update-moving (appstate-snake state)) ; call the fuction to move the snake to left
-                                                               (appstate-apple state)                 ; apple is the same
-                                                               (appstate-game state)                  ; game is the same
-                                                               (appstate-quit state))]))              ; quit is the same
+    [(string=? 
+      (snake-direction (appstate-snake state)) "up") 
+        (make-appstate
+          (update-moving (appstate-snake state)) ; call the fuction to move the snake to up
+          (appstate-apple state)                 ; apple is the same
+          (appstate-game state)                  ; game is the same
+          (appstate-quit state))]                ; quit is the same
+    [(string=? 
+      (snake-direction (appstate-snake state)) "right") 
+      (make-appstate
+        (update-moving (appstate-snake state)) ; call the fuction to move the snake to right
+        (appstate-apple state)                 ; apple is the same
+        (appstate-game state)                  ; game is the same
+        (appstate-quit state))]                ; quit is the same
+    [(string=? 
+      (snake-direction (appstate-snake state)) "down") 
+      (make-appstate
+        (update-moving (appstate-snake state)) ; call the fuction to move the snake to down
+        (appstate-apple state)                 ; apple is the same
+        (appstate-game state)                  ; game is the same
+        (appstate-quit state))]                ; quit is the same
+    [(string=? 
+      (snake-direction (appstate-snake state)) "left") 
+      (make-appstate
+        (update-moving (appstate-snake state)) ; call the fuction to move the snake to left
+        (appstate-apple state)                 ; apple is the same
+        (appstate-game state)                  ; game is the same
+        (appstate-quit state))]))              ; quit is the same
 
 
 
@@ -494,26 +502,34 @@
 ; Code
 (define (update-moving snake)
   (cond
-    [(string=? (snake-direction snake) "up") (make-snake
-                                              (make-posn (posn-x (snake-position snake))           ; x is the same
-                                                         (+ (posn-y (snake-position snake)) 25))   ; y increase
-                                              (snake-length snake)                                 ; length is the same
-                                              (snake-direction snake))]                            ; direction is the same
-    [(string=? (snake-direction snake) "right") (make-snake
-                                                 (make-posn (- (posn-x (snake-position snake)) 25) ; x decrease
-                                                            (posn-y (snake-position snake)))       ; y is the same
-                                                 (snake-length snake)                              ; length is the same
-                                                 (snake-direction snake))]                         ; direction is the same
-    [(string=? (snake-direction snake) "down") (make-snake
-                                                (make-posn (posn-x (snake-position snake))         ; x is the same
-                                                           (- (posn-y (snake-position snake)) 25)) ; y decrease
-                                                (snake-length snake)                               ; length is the same
-                                                (snake-direction snake))]                          ; direction is the same
-    [(string=? (snake-direction snake) "left") (make-snake
-                                                (make-posn (+ (posn-x (snake-position snake)) 25) ; x increase
-                                                           (posn-y (snake-position snake)))       ; y is the same
-                                                (snake-length snake)                              ; length is the same
-                                                (snake-direction snake))]))                       ; direction is the same
+    [(string=? 
+      (snake-direction snake) "up") 
+      (make-snake
+        (make-posn (posn-x (snake-position snake))           ; x is the same
+                    (+ (posn-y (snake-position snake)) 25))   ; y increase
+        (snake-length snake)                                 ; length is the same
+        (snake-direction snake))]                            ; direction is the same
+    [(string=? 
+      (snake-direction snake) "right") 
+      (make-snake
+        (make-posn (- (posn-x (snake-position snake)) 25) ; x decrease
+                  (posn-y (snake-position snake)))       ; y is the same
+        (snake-length snake)                              ; length is the same
+        (snake-direction snake))]                         ; direction is the same
+    [(string=? 
+      (snake-direction snake) "down") 
+      (make-snake
+        (make-posn (posn-x (snake-position snake))         ; x is the same
+                    (- (posn-y (snake-position snake)) 25)) ; y decrease
+        (snake-length snake)                               ; length is the same
+        (snake-direction snake))]                          ; direction is the same
+    [(string=? 
+      (snake-direction snake) "left") 
+      (make-snake
+        (make-posn (+ (posn-x (snake-position snake)) 25) ; x increase
+                    (posn-y (snake-position snake)))      ; y is the same
+        (snake-length snake)                              ; length is the same
+        (snake-direction snake))]))                       ; direction is the same
 
 
 
