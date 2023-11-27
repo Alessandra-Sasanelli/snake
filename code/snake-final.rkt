@@ -1,6 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname snake-final) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+#reader(lib "htdp-advanced-reader.ss" "lang")((modname snake-final) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
 ;; Convenzioni
 ;  - constants UPPERCASE
 ;  - anything else lowercase using kebab-case
@@ -10,7 +10,7 @@
 (require 2htdp/universe)
 (require 2htdp/image)
 
-;; Data Types
+;; DATA TYPES
 
 ; a SnakeUnit is an Image
 ; It represents the little rectangles that the snake is made off
@@ -63,10 +63,9 @@
 ; - apple is an Apple
 ; - game is a Game
 ; - quit is a Quit
-(define-struct appstate [snake apple game quit])
+(define-struct appstate [snake apple freepositions game quit])
 
-;; Constants
-
+;; CONSTANTS
 ; app scene background
 (define BACKGROUND (empty-scene 501 501 "white"))
 
@@ -95,9 +94,8 @@
 (define QUIT-F #false)
 (define QUIT-T #true)
 
-; all positions on the board
-
-; make-positions is a function to compute all the positions on the background
+; make-positions: Number Number Number List<Posn> -> List<Posn>
+; computes all the positions on the background before the game starts
 (define (make-positions n x y lop)
   (cond
     [(= n 400) lop]
@@ -118,15 +116,83 @@
        )
      ]))
 
+; compute-available-pos: Snake Apple List<Posn> -> List<Posn>
+; compute available positions on the background
+(define (compute-available-pos snake apple lop)
+  (cond
+    [(empty? (rest lop)) '()]
+    [(equal? apple (first lop)) (compute-available-pos snake apple (rest lop))]
+    [(equal? (first (snake-position snake)) (first lop))
+     (compute-available-pos
+      (make-snake
+       (rest (snake-position snake))
+       (snake-lenght snake)
+       (snake-direction snake)) apple (rest lop))]
+    [else
+     (cons (first lop) (compute-available-pos snake apple (rest lop)))]))
+
 ; All the positions on the background
 (define BACKGROUNDPOS (make-positions 1 1 1 (list (make-posn 13 13))))
+
+;; FUNCTIONS
+; compute-apple-position: Number Number List<Posn> -> Apple
+; computes the apple position based on available positions
+(define (compute-apple-position n acc lop)
+  (cond
+    [(= n acc) (first lop)]
+    [else
+     (compute-apple-position n (+ acc 1) (rest lop))]))
+
+
+; draw-snake: Snake -> Image
+; draws the snake on the background
+(define (draw-snake snake)
+  (cond
+    [(empty? (rest (snake-position snake)))
+     (place-image
+      SNAKEUNIT
+      (posn-x (first (snake-position snake)))
+      (posn-y (first (snake-position snake)))
+      BACKGROUND)]
+    [else
+     (place-image
+      SNAKEUNIT
+      (posn-x (first (snake-position snake)))
+      (posn-y (first (snake-position snake)))
+      (draw-snake
+       (make-snake (rest (snake-position snake)) (snake-lenght snake) (snake-direction snake))))
+     ]))
+
+; draw-appstate: AppState -> Image
+; draws the appstate
+(define (draw-appstate appstate)
+  (place-image
+   APPLEUNIT
+   (posn-x (appstate-apple appstate))
+   (posn-y (appstate-apple appstate))
+   (draw-snake (appstate-snake appstate))))
+
+; move-snake: Snake -> Snake
+; updates the snake position
+;(define (move-snake snake)
+;  )
 
 
 ;; MAIN APPLICATION
 
-;(define (snake-game appstate)
-;  (big-bang appstate
-;    [to-draw draw]                              ; draw the snake
-;    [on-key handle-keyboard]                    ; change snake's direction or reset game or quit the game
-;    [on-tick move-snake  (time-tick appstate)]  ; uptade snake's position and "time" incrase each tick
-;    [stop-when end?]))                          ; quit the application
+; the first Snake
+(define SNAKE1 (make-snake (list (make-posn 63 13) (make-posn 38 13) (make-posn 13 13)) 3 RIGHT))
+
+; the first example of an Apple
+(define APPLE1 (compute-apple-position (random 401) 1 (compute-available-pos SNAKE1 (make-posn 0 0) BACKGROUNDPOS)))
+
+; the default AppState
+(define DEFAULT (make-appstate SNAKE1 APPLE1 (compute-available-pos SNAKE1 APPLE1 BACKGROUNDPOS) GAME-F QUIT-F))
+
+(define (snake-game appstate)
+  (big-bang appstate
+    [to-draw draw-appstate]                     ; draw the snake
+;    [on-key handle-keyboard]                   ; change snake's direction or reset game or quit the game
+;    [on-tick move-appstate 0.2]                 ; uptade snake's position and "time" incrase each tick
+;    [stop-when end?]                           ; quit the application
+    ))                          
