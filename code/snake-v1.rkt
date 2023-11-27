@@ -38,7 +38,7 @@
 (define SNAKEHEAD (place-image EYE 7 12 (place-image EYE 17 12 (place-image TONGUE 12 3 SNAKEUNIT))))
 
 ; a SnakeDefault is an Image
-; It represents the default snake at the beginning of the game
+; It represents the DEFAULT snake at the beginning of the game
 (define Snake_default (overlay/xy (rotate -90 SNAKEHEAD) -225 -225 (overlay/xy SNAKEUNIT -200 -225 (overlay/xy SNAKEUNIT -175 -225 BACKGROUND))))
 ;(define Snake_default_2 (overlay/xy (rotate -90 SNAKEHEAD) -50 0 (overlay/xy SNAKEUNIT -25 0 (overlay/xy SNAKEUNIT 0 0 Snake_back))))
 ;; Simo, io non sono convinta di questa definizione, nel senso che, SnakeDefault non ha senso definirlo come un data type...
@@ -180,7 +180,7 @@
 
 (define-struct appstate [snake apple game quit])
 
-(define DAFAULT (make-appstate SnakeDefault Apple1 Game_t quit_f))
+(define DEFAULT (make-appstate SnakeDefault Apple1 Game_t quit_f))
 (define E1 (make-appstate Snake1 Apple1 Game_t quit_f))
 (define E2 (make-appstate Snake2 Apple1 Game_t quit_f))
 (define E3 (make-appstate Snake3 Apple1 Game_t quit_f))
@@ -204,11 +204,7 @@
 
 
 (define (draw state)
-<<<<<<< HEAD
-  (overlay/xy AppleUnit (posn-x Apple2) (posn-y Apple2) (overlay/xy SnakeUnit (x-cord (appstate-snake state)) (y-cord (appstate-snake state)) Background)))
-=======
   (overlay/xy APPLEUNIT (posn-x Apple2) (- (posn-y Apple2) 1) (overlay/xy SNAKEUNIT (x-cord (appstate-snake state)) (y-cord (appstate-snake state)) BACKGROUND)))
->>>>>>> e48626782c824f0470f163c1c52db55515d4f52b
 
 (define (x-cord snake)
   (posn-x (snake-position snake)))
@@ -239,12 +235,8 @@
 (check-expect (handle-keyboard E4 "down") (make-appstate (make-snake (make-posn -52 -26) 6 Down) Apple1 Game_t quit_f))
 (check-expect (handle-keyboard E1 "down") E1)
 (check-expect (handle-keyboard E1 "left") (make-appstate (make-snake (make-posn -26 -26) 3 Left) Apple1 Game_t quit_f))
-<<<<<<< HEAD
 (check-expect (handle-keyboard E4 "left") E4)
-(check-expect (handle-keyboard E1 "r") Default)
-=======
 (check-expect (handle-keyboard E1 "r") DEFAULT)
->>>>>>> e48626782c824f0470f163c1c52db55515d4f52b
 (check-expect (handle-keyboard E1 "escape") E7)
 (check-expect (handle-keyboard E7 "escape") E7)
 (check-expect (handle-keyboard E1 "") E1)
@@ -368,7 +360,7 @@
 ; Code
 (define (reset state)
   (cond
-    [(boolean=? (appstate-game state) #true) Default] ; the game continue to run
+    [(boolean=? (appstate-game state) #true) DEFAULT] ; the game continue to run
     [else state]))                                    ; the game is reseted
 
 
@@ -410,16 +402,16 @@
 ;                                    (make-snake (make-posn -250 -225)
 ;                                                (snake-length SnakeDefault)
 ;                                                (snake-direction SnakeDefault))
-;                                    (appstate-apple Default)
-;                                    (appstate-game Default)
-;                                    (appstate-quit Default)))
+;                                    (appstate-apple DEFAULT)
+;                                    (appstate-game DEFAULT)
+;                                    (appstate-quit DEFAULT)))
 
 ; Examples
-(check-expect (move-snake Default) (make-appstate
+(check-expect (move-snake DEFAULT) (make-appstate
                                     (make-snake (make-posn -250 -225) (snake-length SnakeDefault) (snake-direction SnakeDefault))
-                                    (appstate-apple Default)
-                                    (appstate-game Default)
-                                    (appstate-quit Default)))
+                                    (appstate-apple DEFAULT)
+                                    (appstate-game DEFAULT)
+                                    (appstate-quit DEFAULT)))
 (check-expect (move-snake E1) (make-appstate
                                (make-snake (make-posn -26 -1) (snake-length (appstate-snake E1))(snake-direction (appstate-snake E1)))
                                (appstate-apple E1)
