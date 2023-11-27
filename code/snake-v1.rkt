@@ -28,18 +28,31 @@
 
 ; a SnakeHead is an Image
 ; It represents the head of the snake with 'EYE' and 'TONGUE'
-; EYE
+; eye
 (define EYE (circle 3 "solid" "black"))
 
 ; tounge
-(define TONGUE (rectangle 3 10 "solid" "red"))
+(define TONGUE (rectangle 10 3 "solid" "red"))
+(define TONGUE2 (rectangle 3 10 "solid" "red"))
+
 
 ; head
-(define SNAKEHEAD (place-image EYE 7 12 (place-image EYE 17 12 (place-image TONGUE 12 3 SNAKEUNIT))))
+(define HEAD (put-image SNAKEUNIT 0 12 (circle 12 'solid 'green)))
+
+(define SnakeHead (place-image EYE 10 8 (place-image EYE 10 16 (place-image TONGUE 20 12 HEAD))))
+(define SnakeHead2 (place-image EYE 7 12 (place-image EYE 17 12 (place-image TONGUE2 12 3 (rotate 90 HEAD)))))
+
+; tail
+(define TAIL (put-image SNAKEUNIT 24 12 (circle 12 'solid 'green)))
+
+
+
+
 
 ; a SnakeDefault is an Image
 ; It represents the DEFAULT snake at the beginning of the game
-(define Snake_default (overlay/xy (rotate -90 SNAKEHEAD) -225 -225 (overlay/xy SNAKEUNIT -200 -225 (overlay/xy SNAKEUNIT -175 -225 BACKGROUND))))
+(define Snake_default (overlay/xy SnakeHead -225 -225 (overlay/xy SNAKEUNIT -200 -225 (overlay/xy TAIL -175 -225 BACKGROUND))))
+(define Snake_default2 (overlay/xy (rotate -90 SnakeHead2) -225 -225 (overlay/xy SNAKEUNIT -200 -225 (overlay/xy TAIL -175 -225 BACKGROUND))))
 ;(define Snake_default_2 (overlay/xy (rotate -90 SNAKEHEAD) -50 0 (overlay/xy SNAKEUNIT -25 0 (overlay/xy SNAKEUNIT 0 0 Snake_back))))
 ;; Simo, io non sono convinta di questa definizione, nel senso che, SnakeDefault non ha senso definirlo come un data type...
 ;; d'altronde questo e solo uno stato del serpente, quindi e gia compreso nello struct per lo snake.
