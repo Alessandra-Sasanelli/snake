@@ -68,7 +68,7 @@
 ;; Constants
 
 ; app scene background
-(define BACKGROUND (empty-scene 500 500 "white"))
+(define BACKGROUND (empty-scene 501 501 "white"))
 
 ; SnakeUnit
 (define SNAKEUNIT (rectangle 24 24 "solid" "green"))
@@ -96,7 +96,8 @@
 (define QUIT-T #true)
 
 ; all positions on the board
-;(define POSITIONS (list ))
+
+; make-positions is a function to compute all the positions on the background
 (define (make-positions n x y lop)
   (cond
     [(= n 400) lop]
@@ -112,10 +113,13 @@
         (make-positions
          (+ n 1)
          (+ x 1)
-         1
+         y
          (cons (make-posn (+ (* 12 (+ (* x 2) 1)) (+ x 1)) (posn-y (first lop))) lop))]
        )
      ]))
+
+; All the positions on the background
+(define BACKGROUNDPOS (make-positions 1 1 1 (list (make-posn 13 13))))
 
 
 ;; MAIN APPLICATION
