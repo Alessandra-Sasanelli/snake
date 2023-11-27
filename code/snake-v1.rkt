@@ -291,47 +291,51 @@
 ;(define (change-snake-direction dir state)
 ;  (cond
 ;    [(string=? dir "up") ... state ...]
-;    [(string=? dir "left") ... state ...]
+;    [(string=? dir "right") ... state ...]
 ;    [(string=? dir "down") ... state ...]
-;    [(string=? dir "right") ... state ...]))
+;    [(string=? dir "left") ... state ...]))
 
 ; Code
 (define (change-snake-direction dir state)
   (cond
-    [(string=? dir "up") (make-appstate (make-snake (snake-position (appstate-snake state)) (snake-length (appstate-snake state)) "up") (appstate-apple state) (appstate-game state) (appstate-quit state))]     ; change the direction to up
-    [(string=? dir "right") (make-appstate (make-snake (snake-position (appstate-snake state)) (snake-length (appstate-snake state)) "right") (appstate-apple state) (appstate-game state) (appstate-quit state))]  ; change the direction to right
-    [(string=? dir "down") (make-appstate (make-snake (snake-position (appstate-snake state)) (snake-length (appstate-snake state)) "down") (appstate-apple state) (appstate-game state) (appstate-quit state))]   ; change the direction to down
-    [(string=? dir "left") (make-appstate (make-snake (snake-position (appstate-snake state)) (snake-length (appstate-snake state)) "left") (appstate-apple state) (appstate-game state) (appstate-quit state))])) ; change the direction to left
+    [(string=? dir "up") (make-appstate                            ; create new appstate where :
+                          (make-snake                               ; snake's
+                           (snake-position (appstate-snake state))   ;  position is the same
+                           (snake-length (appstate-snake state))     ;  length is the same
+                           "up")                                     ;  direction changed to up
+                          (appstate-apple state)                    ; apple's position is the same
+                          (appstate-game state)                     ; game's state is the same
+                          (appstate-quit state))]                   ; quit's state is the same
+    
+    [(string=? dir "right") (make-appstate                         ; create new appstate where :
+                          (make-snake                               ; snake's
+                           (snake-position (appstate-snake state))   ;  position is the same
+                           (snake-length (appstate-snake state))     ;  length is the same
+                           "right")                                  ;  direction changed to right
+                          (appstate-apple state)                    ; apple's position is the same
+                          (appstate-game state)                     ; game's state is the same
+                          (appstate-quit state))]                   ; quit's state is the same
+    
+    [(string=? dir "down") (make-appstate                          ; create new appstate where :
+                          (make-snake                               ; snake's
+                           (snake-position (appstate-snake state))   ;  position is the same
+                           (snake-length (appstate-snake state))     ;  length is the same
+                           "down")                                   ;  direction changed to down
+                          (appstate-apple state)                    ; apple's position is the same
+                          (appstate-game state)                     ; game's state is the same
+                          (appstate-quit state))]                   ; quit's state is the same
+    
+    [(string=? dir "left") (make-appstate                          ; create new appstate where :
+                          (make-snake                               ; snake's
+                           (snake-position (appstate-snake state))   ;  position is the same
+                           (snake-length (appstate-snake state))     ;  length is the same
+                           "left")                                   ;  direction changed to left
+                          (appstate-apple state)                    ; apple's position is the same
+                          (appstate-game state)                     ; game's state is the same
+                          (appstate-quit state))]))                 ; quit's state is the same
 
 
 
-;;;;;;;;;;; UPDATE SNAKE DIRECTION ;;;;;;;;;;
-;
-;; update-snake-position : Direction Snake -> Snake
-;; updates snake position based on snake direction
-;
-;; Examples
-;(check-expect (update-snake-position "up" Snake2) (make-snake (make-posn -26 -26) 4 "up"))
-;(check-expect (update-snake-position "right" Snake4) (make-snake (make-posn -52 -26) 6 "right"))
-;(check-expect (update-snake-position "down" Snake1) (make-snake (make-posn -26 -26) 3 "down"))
-;(check-expect (update-snake-position "left" Snake3) (make-snake (make-posn -26 -52) 5 "left"))
-;(check-expect (update-snake-position "up" Snake5) (make-snake (make-posn -1 -1) 3 "up"))
-;
-;; Template
-;;(define (update-snake-position dir snake)
-;;  (cond
-;;    [(string=? dir "up") ... snake ...]
-;;    [(string=? dir "left") ... snake ...]
-;;    [(string=? dir "right") ... snake ...]
-;;    [(string=? dir "down") ... snake ...]
-;
-;; Code
-;(define (update-snake-position dir snake)
-;  (cond
-;    [(string=? dir "up") (make-snake (snake-position snake) (snake-length snake) "up")]        ; change the direction to up
-;    [(string=? dir "right") (make-snake (snake-position snake) (snake-length snake) "right")]  ; change the direction to right
-;    [(string=? dir "down") (make-snake (snake-position snake) (snake-length snake) "down")]    ; change the direction to down
-;    [(string=? dir "left") (make-snake (snake-position snake) (snake-length snake) "left")]))  ; change the direction to left
 
 
 ;;;;;;;;;; RESET ;;;;;;;;;;
