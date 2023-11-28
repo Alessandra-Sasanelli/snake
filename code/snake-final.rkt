@@ -120,7 +120,7 @@
 ; compute available positions on the background
 (define (compute-available-pos snake apple lop)
   (cond
-    [(empty? (rest lop)) '()]
+    [(or (empty? (rest lop)) (empty? (rest (snake-position snake)))) '()]
     [(equal? apple (first lop)) (compute-available-pos snake apple (rest lop))]
     [(equal? (first (snake-position snake)) (first lop))
      (compute-available-pos
@@ -142,7 +142,6 @@
     [(= n acc) (first lop)]
     [else
      (compute-apple-position n (+ acc 1) (rest lop))]))
-
 
 ; draw-snake: Snake -> Image
 ; draws the snake on the background
@@ -172,16 +171,156 @@
    (posn-y (appstate-apple appstate))
    (draw-snake (appstate-snake appstate))))
 
-; move-snake: Snake -> Snake
-; updates the snake position
-;(define (move-snake snake)
-;  )
+; increment-pos: Number -> Number
+; increments the x or the y position of a posn
+(define (increment-pos xy)
+  (+ xy 25))
 
+; decrement-pos: Number -> Number
+; decrements the x or the y position of a posn
+(define (decrement-pos xy)
+  (- xy 25))
+
+; last: List<Posn> -> List<Posn>
+; returns the last element of a list
+(define (last lop)
+  (cond
+    [(empty? (rest lop)) (first lop)]
+    [else
+     (last (rest lop))]))
+
+; update-positions: Direction List<Posn> -> List<Posn>
+; updates a list of position to new list of positions 
+(define (update-positions dir lop)
+  (cond
+    [(empty? (rest lop))
+     (cond
+       [(string=? dir UP) (cons (make-posn (posn-x (first lop)) (decrement-pos (posn-y (first lop)))) '())]
+       [(string=? dir DOWN) (cons (make-posn (posn-x (first lop)) (increment-pos (posn-y (first lop)))) '())]
+       [(string=? dir RIGHT) (cons (make-posn (increment-pos (posn-x (first lop))) (posn-y (first lop))) '())]
+       [(string=? dir LEFT) (cons (make-posn (decrement-pos (posn-x (first lop))) (posn-y (first lop))) '())]
+       )]
+    [else
+     (cond
+       [(and (string=? dir UP) (= (posn-x (first lop)) (posn-x (last lop))))
+        (cons (make-posn (posn-x (first lop)) (decrement-pos (posn-y (first lop)))) (update-positions dir (rest lop)))]
+       [(and (string=? dir DOWN) (= (posn-x (first lop)) (posn-x (last lop))))
+        (cons (make-posn (posn-x (first lop)) (increment-pos (posn-y (first lop)))) (update-positions dir (rest lop)))]
+       [(and (string=? dir RIGHT) (= (posn-y (first lop)) (posn-y (last lop))))
+        (cons (make-posn (increment-pos (posn-x (first lop))) (posn-y (first lop))) (update-positions dir (rest lop)))]
+       [(and (string=? dir LEFT) (= (posn-y (first lop)) (posn-y (last lop))))
+        (cons (make-posn (decrement-pos (posn-x (first lop))) (posn-y (first lop))) (update-positions dir (rest lop)))]
+       [else (cons (first lop) (move-snake dir (rest lop)))]
+       )]))
+
+; change-snake-direction: String Snake -> Snake
+; changes snake's head direction
+(define (change-snake-direction direction snake)
+  (cond
+    [(string=? direction UP)
+     (make-snake (update-positions direction (snake-position snake)) (snake-lenght snake) UP)]
+    [(string=? direction DOWN)
+     (make-snake (update-positions direction (snake-position snake)) (snake-lenght snake) DOWN)]
+    [(string=? direction LEFT)
+     (make-snake (update-positions direction (snake-position snake)) (snake-lenght snake) LEFT)]
+    [(string=? direction RIGHT)
+     (make-snake (update-positions direction (snake-position snake)) (snake-lenght snake) RIGHT)]
+    [else snake]))
+
+; move-snake: Direction List<Posn> -> List<Posn>
+(define (move-snake dir lop)
+  (cond
+    [(string=? dir UP)
+     (if (empty? (rest lop))
+         (cons (make-posn (posn-x (first lop)) (decrement-pos (posn-y (first lop)))) '())
+         (cons (make-posn (posn-x (first lop)) (decrement-pos (posn-y (first lop)))) (move-snake dir (rest lop))))]
+    [(string=? dir DOWN)
+     (if (empty? (rest lop))
+         (cons (make-posn (posn-x (first lop)) (increment-pos (posn-y (first lop)))) '())
+         (cons (make-posn (posn-x (first lop)) (increment-pos (posn-y (first lop)))) (update-positions dir (rest lop))))]
+    [(string=? dir LEFT)
+     (if (empty? (rest lop))
+         (cons (make-posn (decrement-pos (posn-x (first lop))) (posn-y (first lop))) '())
+         (cons (make-posn (decrement-pos (posn-x (first lop))) (posn-y (first lop))) (update-positions dir (rest lop))))]
+    [(string=? dir RIGHT)
+     (if (empty? (rest lop))
+         (cons (make-posn (increment-pos (posn-x (first lop))) (posn-y (first lop))) '())
+         (cons (make-posn (increment-pos (posn-x (first lop))) (posn-y (first lop))) (update-positions dir (rest lop))))]))
+
+; move: AppState -> AppState
+(define (move appstate)
+  (make-appstate
+   (make-snake
+    (move-snake (snake-direction (appstate-snake appstate)) (snake-position (appstate-snake appstate))) (snake-lenght (appstate-snake appstate)) (snake-direction (appstate-snake appstate)))
+   (appstate-apple appstate)
+   (compute-available-pos
+    (make-snake
+    (move-snake (snake-direction (appstate-snake appstate)) (snake-position (appstate-snake appstate))) (snake-lenght (appstate-snake appstate)) (snake-direction (appstate-snake appstate)))
+    (appstate-apple appstate)
+    BACKGROUNDPOS)
+   (appstate-game appstate)
+   (appstate-quit appstate)))
+
+; time-tick: AppState -> Number
+; changes the speed of the snake based on snake lenght
+(define (time-tick state) (/ 2.7 (snake-lenght (appstate-snake state))))
+
+; reset: AppState -> AppState
+; changes the game in the appstate
+(define (reset state)
+  (cond
+    [(boolean=? (appstate-game state) #true) DEFAULT] ; the game continue to run
+    [else state]))
+
+; quit: AppState -> AppState
+; changes the quit in the appstate
+(define (quit state) (make-appstate
+                      (appstate-snake state) ; the snake remain the same
+                      (appstate-apple state) ; the apple remain the same
+                      (appstate-game state)  ; the game remain the same
+                      #true))  
+
+; handle-keyboard: AppState KeyboardEvent -> AppState
+; handles the keyboard events
+(define (handle-keyboard state key)
+  (cond
+    [(not (string? key)) state]                                                                          ; for any possible not-key input which are not a string, the output is the same AppState as before
+    [(or (and (string=? key "up") (string=? (snake-direction (appstate-snake state)) "down"))            ; if the direction is opposite of the key, the state is the same
+         (and (string=? key "right") (string=? (snake-direction (appstate-snake state)) "left"))         ; if the direction is opposite of the key, the state is the same
+         (and (string=? key "down") (string=? (snake-direction (appstate-snake state)) "up"))            ; if the direction is opposite of the key, the state is the same
+         (and (string=? key "left") (string=? (snake-direction (appstate-snake state)) "right"))) state] ; if the direction is opposite of the key, the state is the same
+    [(or (string=? key "up") (string=? key "right") (string=? key "down") (string=? key "left"))
+     (make-appstate
+      (change-snake-direction key (appstate-snake state))
+      (appstate-apple state)
+      (compute-available-pos (change-snake-direction key (appstate-snake state)) (appstate-apple state) BACKGROUNDPOS)
+      (appstate-game state)
+      (appstate-quit state))]                                             ; change the direction to up                                        ; change the direction to left
+    [(string=? key "r") (reset state)]                                                                   ; reset the game
+    [(string=? key "escape") (quit state)]                                                               ; quit the game
+    [else state]))
+
+; check-position-out: Posn List<Posn> -> Boolean
+; checks wheather the given posn is into backgroundpos
+(define (check-position-out pos lop)
+  (cond
+    [(empty? (rest lop)) (if (equal? pos (first lop)) #true #false)]
+    [else
+     (if (equal? pos (first lop)) #true (check-position-out pos (rest lop)))]))
+
+
+; end?: AppState -> Boolean
+; stops the game
+(define (end? state)
+  (cond
+    [(check-position-out (first (snake-position (appstate-snake state))) BACKGROUNDPOS) #true] ; if the snake is over the left limit the application turn off
+    [(boolean=? (appstate-quit state) #false) #false]                                                ; the application remains on
+    [else #true]))   
 
 ;; MAIN APPLICATION
 
 ; the first Snake
-(define SNAKE1 (make-snake (list (make-posn 63 13) (make-posn 38 13) (make-posn 13 13)) 3 RIGHT))
+(define SNAKE1 (make-snake (list (make-posn 63 13) (make-posn 38 13) (make-posn 13 13)) 3 DOWN))
 
 ; the first example of an Apple
 (define APPLE1 (compute-apple-position (random 401) 1 (compute-available-pos SNAKE1 (make-posn 0 0) BACKGROUNDPOS)))
@@ -191,8 +330,8 @@
 
 (define (snake-game appstate)
   (big-bang appstate
-    [to-draw draw-appstate]                     ; draw the snake
-;    [on-key handle-keyboard]                   ; change snake's direction or reset game or quit the game
-;    [on-tick move-appstate 0.2]                 ; uptade snake's position and "time" incrase each tick
-;    [stop-when end?]                           ; quit the application
+    [to-draw draw-appstate]                                      ; draw the snake
+;    [on-key handle-keyboard]                                    ; change snake's direction or reset game or quit the game
+    [on-tick move (time-tick appstate)]                 ; uptade snake's position and "time" incrase each tick
+;    [stop-when end?]                                            ; quit the application
     ))                          
