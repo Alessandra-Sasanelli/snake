@@ -67,10 +67,10 @@
 
 ;; CONSTANTS
 ; app scene background
-(define BACKGROUND (empty-scene 501 501 "white"))
+(define BACKGROUND (empty-scene 501 501 'white))
 
 ; SnakeUnit
-(define SNAKEUNIT (rectangle 24 24 "solid" "green"))
+(define SNAKEUNIT (rectangle 24 24 'solid 'green))
 
 ; Elements to draw the SnakeHead
 (define EYE (circle 3 "solid" "black"))
@@ -189,63 +189,48 @@
     [else
      (last (rest lop))]))
 
-; update-positions: Direction List<Posn> -> List<Posn>
-; updates a list of position to new list of positions 
-(define (update-positions dir lop)
-  (cond
-    [(empty? (rest lop))
-     (cond
-       [(string=? dir UP) (cons (make-posn (posn-x (first lop)) (decrement-pos (posn-y (first lop)))) '())]
-       [(string=? dir DOWN) (cons (make-posn (posn-x (first lop)) (increment-pos (posn-y (first lop)))) '())]
-       [(string=? dir RIGHT) (cons (make-posn (increment-pos (posn-x (first lop))) (posn-y (first lop))) '())]
-       [(string=? dir LEFT) (cons (make-posn (decrement-pos (posn-x (first lop))) (posn-y (first lop))) '())]
-       )]
-    [else
-     (cond
-       [(and (string=? dir UP) (= (posn-x (first lop)) (posn-x (last lop))))
-        (cons (make-posn (posn-x (first lop)) (decrement-pos (posn-y (first lop)))) (update-positions dir (rest lop)))]
-       [(and (string=? dir DOWN) (= (posn-x (first lop)) (posn-x (last lop))))
-        (cons (make-posn (posn-x (first lop)) (increment-pos (posn-y (first lop)))) (update-positions dir (rest lop)))]
-       [(and (string=? dir RIGHT) (= (posn-y (first lop)) (posn-y (last lop))))
-        (cons (make-posn (increment-pos (posn-x (first lop))) (posn-y (first lop))) (update-positions dir (rest lop)))]
-       [(and (string=? dir LEFT) (= (posn-y (first lop)) (posn-y (last lop))))
-        (cons (make-posn (decrement-pos (posn-x (first lop))) (posn-y (first lop))) (update-positions dir (rest lop)))]
-       [else (cons (first lop) (move-snake dir (rest lop)))]
-       )]))
-
 ; change-snake-direction: String Snake -> Snake
 ; changes snake's head direction
 (define (change-snake-direction direction snake)
   (cond
     [(string=? direction UP)
-     (make-snake (update-positions direction (snake-position snake)) (snake-lenght snake) UP)]
+     (make-snake (snake-position snake) (snake-lenght snake) UP)]
     [(string=? direction DOWN)
-     (make-snake (update-positions direction (snake-position snake)) (snake-lenght snake) DOWN)]
+     (make-snake (snake-position snake) (snake-lenght snake) DOWN)]
     [(string=? direction LEFT)
-     (make-snake (update-positions direction (snake-position snake)) (snake-lenght snake) LEFT)]
+     (make-snake (snake-position snake) (snake-lenght snake) LEFT)]
     [(string=? direction RIGHT)
-     (make-snake (update-positions direction (snake-position snake)) (snake-lenght snake) RIGHT)]
+     (make-snake (snake-position snake) (snake-lenght snake) RIGHT)]
     [else snake]))
 
 ; move-snake: Direction List<Posn> -> List<Posn>
-(define (move-snake dir lop)
-  (cond
-    [(string=? dir UP)
-     (if (empty? (rest lop))
-         (cons (make-posn (posn-x (first lop)) (decrement-pos (posn-y (first lop)))) '())
-         (cons (make-posn (posn-x (first lop)) (decrement-pos (posn-y (first lop)))) (move-snake dir (rest lop))))]
-    [(string=? dir DOWN)
-     (if (empty? (rest lop))
-         (cons (make-posn (posn-x (first lop)) (increment-pos (posn-y (first lop)))) '())
-         (cons (make-posn (posn-x (first lop)) (increment-pos (posn-y (first lop)))) (update-positions dir (rest lop))))]
-    [(string=? dir LEFT)
-     (if (empty? (rest lop))
-         (cons (make-posn (decrement-pos (posn-x (first lop))) (posn-y (first lop))) '())
-         (cons (make-posn (decrement-pos (posn-x (first lop))) (posn-y (first lop))) (update-positions dir (rest lop))))]
-    [(string=? dir RIGHT)
-     (if (empty? (rest lop))
-         (cons (make-posn (increment-pos (posn-x (first lop))) (posn-y (first lop))) '())
-         (cons (make-posn (increment-pos (posn-x (first lop))) (posn-y (first lop))) (update-positions dir (rest lop))))]))
+(define (move-snake d lop)
+     (cond
+       [(string=? d UP)
+        (if (empty? (rest lop))
+            (cons (make-posn (posn-x (first lop)) (decrement-pos (posn-y (first lop)))) '())
+            (cons
+             (make-posn (posn-x (first lop)) (decrement-pos (posn-y (first lop))))
+             (move-snake d (rest lop))))]
+       [(string=? d DOWN)
+        (if (empty? (rest lop))
+            (cons (make-posn (posn-x (first lop)) (increment-pos (posn-y (first lop)))) '())
+            (cons
+             (make-posn (posn-x (first lop)) (increment-pos (posn-y (first lop))))
+             (move-snake d (rest lop))))]
+       [(string=? d LEFT)
+        (if (empty? (rest lop))
+            (cons (make-posn (decrement-pos (posn-x (first lop))) (posn-y (first lop))) '())
+            (cons
+             (make-posn (decrement-pos (posn-x (first lop))) (posn-y (first lop)))
+             (move-snake d (rest lop))))]
+       [(string=? d RIGHT)
+        (if (empty? (rest lop))
+            (cons (make-posn (increment-pos (posn-x (first lop))) (posn-y (first lop))) '())
+            (cons
+             (make-posn (increment-pos (posn-x (first lop))) (posn-y (first lop)))
+             (move-snake d (rest lop))))]))
+
 
 ; move: AppState -> AppState
 (define (move appstate)
@@ -295,7 +280,7 @@
       (appstate-apple state)
       (compute-available-pos (change-snake-direction key (appstate-snake state)) (appstate-apple state) BACKGROUNDPOS)
       (appstate-game state)
-      (appstate-quit state))]                                             ; change the direction to up                                        ; change the direction to left
+      (appstate-quit state))]                                                                                     
     [(string=? key "r") (reset state)]                                                                   ; reset the game
     [(string=? key "escape") (quit state)]                                                               ; quit the game
     [else state]))
@@ -318,9 +303,8 @@
     [else #true]))   
 
 ;; MAIN APPLICATION
-
 ; the first Snake
-(define SNAKE1 (make-snake (list (make-posn 63 13) (make-posn 38 13) (make-posn 13 13)) 3 DOWN))
+(define SNAKE1 (make-snake (list (make-posn 63 13) (make-posn 38 13) (make-posn 13 13)) 3 RIGHT))
 
 ; the first example of an Apple
 (define APPLE1 (compute-apple-position (random 401) 1 (compute-available-pos SNAKE1 (make-posn 0 0) BACKGROUNDPOS)))
@@ -331,7 +315,7 @@
 (define (snake-game appstate)
   (big-bang appstate
     [to-draw draw-appstate]                                      ; draw the snake
-;    [on-key handle-keyboard]                                    ; change snake's direction or reset game or quit the game
-    [on-tick move (time-tick appstate)]                 ; uptade snake's position and "time" incrase each tick
+    [on-key handle-keyboard]                                     ; change snake's direction or reset game or quit the game
+    [on-tick move (time-tick appstate)]                          ; uptade snake's position and "time" incrase each tick
 ;    [stop-when end?]                                            ; quit the application
     ))                          
