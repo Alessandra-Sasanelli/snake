@@ -49,9 +49,10 @@
 ; (make-snake position length direction)
 ; where:
 ; - position is a List<Posn>    --> represents the positions of the elements that make up the snake
-; - length is a length          --> the length of the snake
+; - length is a Length          --> the length of the snake
 ; - direction is a Direction    --> the direction of the head
-(define-struct snake [position length direction])
+; - breakpoint is a List<Posn>  --> represents at which positions has the snake changed direction        
+(define-struct snake [position length direction breakpoint])
 
 ; an Apple is a Position
 ; it represents the position of the apple at a particular moment
@@ -123,20 +124,54 @@
        )
      ]))
 
-; compute-available-pos: Snake Apple List<Posn> -> List<Posn>
-; compute available positions on the background
-(define (compute-available-pos snake apple lop)
+
+;;;;;;;;;; CHECK POSITION OUT ;;;;;;;;;;
+; check-position-out: Posn List<Posn> -> Boolean
+; checks wheather the given posn is into backgroundpos
+; Header (define (check-position-out pos lop) #false
+
+;Examples
+;the left limit
+(check-expect (check-position-out (make-posn 13 13) BACKGROUNDPOS) #false)
+(check-expect (check-position-out (make-posn -12 13) BACKGROUNDPOS) #true)
+; the right limit
+(check-expect (check-position-out (make-posn 488 13) BACKGROUNDPOS) #false)
+(check-expect (check-position-out (make-posn 513 13) BACKGROUNDPOS) #true)
+; the top limit
+(check-expect (check-position-out (make-posn 13 13) BACKGROUNDPOS) #false)
+(check-expect (check-position-out (make-posn 13 -12) BACKGROUNDPOS) #true)
+; the bottom limit
+(check-expect (check-position-out (make-posn 13 488) BACKGROUNDPOS) #false)
+(check-expect (check-position-out (make-posn 13 513) BACKGROUNDPOS) #true)
+
+; Template
+;(define (check-position-out pos lop)
+;  (cond
+;    [(empty? (rest lop)) ... boolean ...]
+;    [else ... boolean ...]))
+
+; Code
+(define (check-position-out pos lop)
   (cond
-    [(or (empty? (rest lop)) (empty? (rest (snake-position snake)))) '()]
-    [(equal? apple (first lop)) (compute-available-pos snake apple (rest lop))]
-    [(equal? (first (snake-position snake)) (first lop))
-     (compute-available-pos
-      (make-snake
-       (rest (snake-position snake))
-       (snake-length snake)
-       (snake-direction snake)) apple (rest lop))]
+    [(empty? (rest lop)) (if (equal? pos (first lop)) #false #true)]             ; if rest of list is empty, check if pos = first of list
     [else
-     (cons (first lop) (compute-available-pos snake apple (rest lop)))]))
+     (if (equal? pos (first lop)) #false (check-position-out pos (rest lop)))])) ; if el pos = first of lop, return false, owhtewise, go ahead
+
+(define (delete-el pos lop)
+  (cond
+    [(empty? (rest lop)) (if (equal? pos (first lop)) '() (cons (first lop) '()))]                   ; Alessandra commenta tu cosa fa
+    [else
+     (if (equal? pos (first lop)) (rest lop) (cons (first lop) (delete-el pos (rest lop))))])) ; Alessandra commenta tu cosa fa
+
+; compute-available-pos: List<Posn> List<Posn> -> List<Posn>
+; compute available positions on the background
+(define (compute-available-pos snake lop)
+  (cond
+    [(or (empty? lop) (empty? snake)) lop]
+    [else
+     (compute-available-pos
+      (rest snake)
+      (delete-el (first snake) lop))]))
 
 ; All the positions on the background
 (define BACKGROUNDPOS (make-positions 1 1 1 (list (make-posn 13 13))))
@@ -147,8 +182,15 @@
 (define (compute-apple-position n acc lop)
   (cond
     [(= n acc) (first lop)]
+    [(empty? lop) (make-posn 13 13)]
     [else
      (compute-apple-position n (+ acc 1) (rest lop))]))
+
+; the first Snake
+(define SNAKE1 (make-snake (list (make-posn 438 488) (make-posn 463 488) (make-posn 488 488)) 3 RIGHT '()))
+
+; the first example of an Apple
+(define APPLE1 (compute-apple-position (random 401) 1 (compute-available-pos (cons (make-posn 0 0)(snake-position SNAKE1)) BACKGROUNDPOS)))
 
 ; draw-snake: Snake -> Image
 ; draws the snake on the background
@@ -166,14 +208,14 @@
       (posn-x (first (snake-position snake)))
       (posn-y (first (snake-position snake)))
       (draw-snake
-       (make-snake (rest (snake-position snake)) (snake-length snake) (snake-direction snake))))]
+       (make-snake (rest (snake-position snake)) (snake-length snake) (snake-direction snake) (snake-breakpoint snake))))]
     [else
      (place-image
       SNAKEUNIT
       (posn-x (first (snake-position snake)))
       (posn-y (first (snake-position snake)))
       (draw-snake
-       (make-snake (rest (snake-position snake)) (snake-length snake) (snake-direction snake))))
+       (make-snake (rest (snake-position snake)) (snake-length snake) (snake-direction snake) (snake-breakpoint snake))))
      ]))
 
 ; draw-appstate: AppState -> Image
@@ -208,13 +250,29 @@
 (define (change-snake-direction direction snake)
   (cond
     [(string=? direction UP)
-     (make-snake (snake-position snake) (snake-length snake) UP)]
+     (make-snake
+      (snake-position snake)
+      (snake-length snake)
+      UP
+      (cons (first (snake-position snake)) (snake-breakpoint snake)))]
     [(string=? direction DOWN)
-     (make-snake (snake-position snake) (snake-length snake) DOWN)]
+     (make-snake
+      (snake-position snake)
+      (snake-length snake)
+      DOWN
+      (cons (first (snake-position snake)) (snake-breakpoint snake)))] 
     [(string=? direction LEFT)
-     (make-snake (snake-position snake) (snake-length snake) LEFT)]
+     (make-snake
+      (snake-position snake)
+      (snake-length snake)
+      LEFT
+      (cons (first (snake-position snake)) (snake-breakpoint snake)))]
     [(string=? direction RIGHT)
-     (make-snake (snake-position snake) (snake-length snake) RIGHT)]
+     (make-snake
+      (snake-position snake)
+      (snake-length snake)
+      RIGHT
+      (cons (first (snake-position snake)) (snake-breakpoint snake)))]
     [else snake]))
 
 ; move-snake: Direction List<Posn> -> List<Posn>
@@ -250,11 +308,17 @@
 (define (move appstate)
   (make-appstate
    (make-snake
-    (move-snake (snake-direction (appstate-snake appstate)) (snake-position (appstate-snake appstate))) (snake-length (appstate-snake appstate)) (snake-direction (appstate-snake appstate)))
+    (move-snake (snake-direction (appstate-snake appstate)) (snake-position (appstate-snake appstate)))
+    (snake-length (appstate-snake appstate))
+    (snake-direction (appstate-snake appstate))
+    (snake-breakpoint (appstate-snake appstate)))
    (appstate-apple appstate)
    (compute-available-pos
     (make-snake
-    (move-snake (snake-direction (appstate-snake appstate)) (snake-position (appstate-snake appstate))) (snake-length (appstate-snake appstate)) (snake-direction (appstate-snake appstate)))
+    (move-snake (snake-direction (appstate-snake appstate)) (snake-position (appstate-snake appstate)))
+    (snake-length (appstate-snake appstate))
+    (snake-direction (appstate-snake appstate))
+    (snake-breakpoint (appstate-snake appstate)))
     (appstate-apple appstate)
     BACKGROUNDPOS)
    (appstate-game appstate)
@@ -286,8 +350,8 @@
 ; Header (define (handle-keyboard state key) (make-appstate SNAKE1 APPLE1 (compute-available-pos SNAKE1 APPLE1 BACKGROUNDPOS) GAME-T QUIT-F))
 
 ; Examples
-(check-expect (handle-keyboard (make-appstate SNAKE1 APPLE1 (compute-available-pos SNAKE1 APPLE1 BACKGROUNDPOS) GAME-T QUIT-F) "")
-              (make-appstate SNAKE1 APPLE1 (compute-available-pos SNAKE1 APPLE1 BACKGROUNDPOS) GAME-T QUIT-F))
+(check-expect (handle-keyboard (make-appstate SNAKE1 APPLE1 (compute-available-pos (cons APPLE1 (snake-position SNAKE1)) BACKGROUNDPOS) GAME-T QUIT-F) "")
+              (make-appstate SNAKE1 APPLE1 (compute-available-pos (cons APPLE1 (snake-position SNAKE1)) BACKGROUNDPOS) GAME-T QUIT-F))
 
 ; Template
 ;(define (handle-keyboard state key)
@@ -326,39 +390,6 @@
     
     [else state]))                                                                                                     ; for any other input the appstate is the same
 
-;;;;;;;;;; CHECK POSITION OUT ;;;;;;;;;;
-; check-position-out: Posn List<Posn> -> Boolean
-; checks wheather the given posn is into backgroundpos
-; Header (define (check-position-out pos lop) #false
-
-;Examples
-;the left limit
-(check-expect (check-position-out (make-posn 13 13) BACKGROUNDPOS) #false)
-(check-expect (check-position-out (make-posn -12 13) BACKGROUNDPOS) #true)
-; the right limit
-(check-expect (check-position-out (make-posn 488 13) BACKGROUNDPOS) #false)
-(check-expect (check-position-out (make-posn 513 13) BACKGROUNDPOS) #true)
-; the top limit
-(check-expect (check-position-out (make-posn 13 13) BACKGROUNDPOS) #false)
-(check-expect (check-position-out (make-posn 13 -12) BACKGROUNDPOS) #true)
-; the bottom limit
-(check-expect (check-position-out (make-posn 13 488) BACKGROUNDPOS) #false)
-(check-expect (check-position-out (make-posn 13 513) BACKGROUNDPOS) #true)
-
-; Template
-;(define (check-position-out pos lop)
-;  (cond
-;    [(empty? (rest lop)) ... boolean ...]
-;    [else ... boolean ...]))
-
-; Code
-(define (check-position-out pos lop)
-  (cond
-    [(empty? (rest lop)) (if (equal? pos (first lop)) #false #true)]             ; Alessandra commenta tu cosa fa
-    [else
-     (if (equal? pos (first lop)) #false (check-position-out pos (rest lop)))])) ; Alessandra commenta tu cosa fa
-
-
 ;;;;;;;;;; END ;;;;;;;;;;
 ; end?: AppState -> Boolean
 ; stops the game
@@ -366,64 +397,64 @@
 
 ; Example
 (check-expect (end? DEFAULT) #false)
-(check-expect (end? (make-appstate SNAKE1 APPLE1 (compute-available-pos SNAKE1 APPLE1 BACKGROUNDPOS) GAME-T QUIT-T)) #true)
+(check-expect (end? (make-appstate SNAKE1 APPLE1 (compute-available-pos (cons APPLE1 (snake-position SNAKE1)) BACKGROUNDPOS) GAME-T QUIT-T)) #true)
 ;the left limit
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 LEFT)
+                     (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 LEFT '())
                      APPLE1
-                     (compute-available-pos SNAKE1 APPLE1 BACKGROUNDPOS)
+                     (compute-available-pos (cons APPLE1 (snake-position SNAKE1)) BACKGROUNDPOS)
                      GAME-T
                      QUIT-F))
               #false)
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn -12 13) (make-posn 13 13) (make-posn 38 13)) 3 LEFT)
+                     (make-snake (list (make-posn -12 13) (make-posn 13 13) (make-posn 38 13)) 3 LEFT '())
                      APPLE1
-                     (compute-available-pos SNAKE1 APPLE1 BACKGROUNDPOS)
+                     (compute-available-pos (cons APPLE1 (snake-position SNAKE1)) BACKGROUNDPOS)
                      GAME-T
                      QUIT-F))
               #true)
 ; the right limit
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 488 13) (make-posn 463 13) (make-posn 438 13)) 3 RIGHT)
+                     (make-snake (list (make-posn 488 13) (make-posn 463 13) (make-posn 438 13)) 3 RIGHT '())
                      APPLE1
-                     (compute-available-pos SNAKE1 APPLE1 BACKGROUNDPOS)
+                     (compute-available-pos (cons APPLE1 (snake-position SNAKE1)) BACKGROUNDPOS)
                      GAME-T
                      QUIT-F))
               #false)
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 513 13) (make-posn 488 13) (make-posn 438 13)) 3 RIGHT)
+                     (make-snake (list (make-posn 513 13) (make-posn 488 13) (make-posn 438 13)) 3 RIGHT '())
                      APPLE1
-                     (compute-available-pos SNAKE1 APPLE1 BACKGROUNDPOS)
+                     (compute-available-pos (cons APPLE1 (snake-position SNAKE1)) BACKGROUNDPOS)
                      GAME-T
                      QUIT-F))
               #true)
 ; the top limit
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 13 13) (make-posn 13 38) (make-posn 13 63)) 3 UP)
+                     (make-snake (list (make-posn 13 13) (make-posn 13 38) (make-posn 13 63)) 3 UP '())
                      APPLE1
-                     (compute-available-pos SNAKE1 APPLE1 BACKGROUNDPOS)
+                     (compute-available-pos (cons APPLE1 (snake-position SNAKE1)) BACKGROUNDPOS)
                      GAME-T
                      QUIT-F))
               #false)
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 13 -12) (make-posn 13 13) (make-posn 13 38)) 3 UP)
+                     (make-snake (list (make-posn 13 -12) (make-posn 13 13) (make-posn 13 38)) 3 UP '())
                      APPLE1
-                     (compute-available-pos SNAKE1 APPLE1 BACKGROUNDPOS)
+                     (compute-available-pos (cons APPLE1 (snake-position SNAKE1)) BACKGROUNDPOS)
                      GAME-T
                      QUIT-F))
               #true)
 ; the bottom limit
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 13 488) (make-posn 13 463) (make-posn 13 438)) 3 DOWN)
+                     (make-snake (list (make-posn 13 488) (make-posn 13 463) (make-posn 13 438)) 3 DOWN '())
                      APPLE1
-                     (compute-available-pos SNAKE1 APPLE1 BACKGROUNDPOS)
+                     (compute-available-pos (cons APPLE1 (snake-position SNAKE1)) BACKGROUNDPOS)
                      GAME-T
                      QUIT-F))
               #false)
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 13 513) (make-posn 13 488) (make-posn 13 463)) 3 DOWN)
+                     (make-snake (list (make-posn 13 513) (make-posn 13 488) (make-posn 13 463)) 3 DOWN '())
                      APPLE1
-                     (compute-available-pos SNAKE1 APPLE1 BACKGROUNDPOS)
+                     (compute-available-pos (cons APPLE1 (snake-position SNAKE1)) BACKGROUNDPOS)
                      GAME-T
                      QUIT-F))
               #true)
@@ -444,14 +475,8 @@
 
 ;;;;;;;;;; MAIN APPLICATIONS ;;;;;;;;;;
 
-; the first Snake
-(define SNAKE1 (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 RIGHT))
-
-; the first example of an Apple
-(define APPLE1 (compute-apple-position (random 401) 1 (compute-available-pos SNAKE1 (make-posn 0 0) BACKGROUNDPOS)))
-
 ; the default AppState
-(define DEFAULT (make-appstate SNAKE1 APPLE1 (compute-available-pos SNAKE1 APPLE1 BACKGROUNDPOS) GAME-T QUIT-F))
+(define DEFAULT (make-appstate SNAKE1 APPLE1 (compute-available-pos (cons APPLE1 (snake-position SNAKE1)) BACKGROUNDPOS) GAME-T QUIT-F))
 
 (define (snake-game appstate)
   (big-bang appstate
