@@ -187,7 +187,7 @@
      (compute-apple-position n (+ acc 1) (rest lop))]))
 
 ; the first Snake
-(define SNAKE1 (make-snake (list (make-posn 438 488) (make-posn 463 488) (make-posn 488 488)) 3 RIGHT '()))
+(define SNAKE1 (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 RIGHT '()))
 
 ; the first example of an Apple
 (define APPLE1 (compute-apple-position (random 401) 1 (compute-available-pos (cons (make-posn 0 0)(snake-position SNAKE1)) BACKGROUNDPOS)))
@@ -314,12 +314,7 @@
     (snake-breakpoint (appstate-snake appstate)))
    (appstate-apple appstate)
    (compute-available-pos
-    (make-snake
-    (move-snake (snake-direction (appstate-snake appstate)) (snake-position (appstate-snake appstate)))
-    (snake-length (appstate-snake appstate))
-    (snake-direction (appstate-snake appstate))
-    (snake-breakpoint (appstate-snake appstate)))
-    (appstate-apple appstate)
+    (cons (appstate-apple appstate) (snake-position (appstate-snake appstate)))
     BACKGROUNDPOS)
    (appstate-game appstate)
    (appstate-quit appstate)))
@@ -370,24 +365,20 @@
 (define (handle-keyboard state key)
   (cond
     [(not (string? key)) state]                                                                                        ; for any possible not-string key input, the output is the same AppState as before
-    
     [(or (and (string=? key "up") (string=? (snake-direction (appstate-snake state)) "down"))                          ; if the direction is opposite of the key, the state is the same
          (and (string=? key "right") (string=? (snake-direction (appstate-snake state)) "left"))                       ; if the direction is opposite of the key, the state is the same
          (and (string=? key "down") (string=? (snake-direction (appstate-snake state)) "up"))                          ; if the direction is opposite of the key, the state is the same
          (and (string=? key "left") (string=? (snake-direction (appstate-snake state)) "right"))) state]               ; if the direction is opposite of the key, the state is the same
-    
     [(or (string=? key "up") (string=? key "right") (string=? key "down") (string=? key "left"))                       ; if the input is one of 'up', 'right', 'down' or 'left'
      (make-appstate                                                                                                    ; create a new appstate where :
       (change-snake-direction key (appstate-snake state))                                                                ; the new snake is returned by the fuction to change the snake;'s direction
       (appstate-apple state)                                                                                             ; the apple's appstate is the same
-      (compute-available-pos (change-snake-direction key (appstate-snake state)) (appstate-apple state) BACKGROUNDPOS)   ; the possible positions' appstate is the same
+      (compute-available-pos
+       (cons (appstate-apple state) (snake-position (change-snake-direction key (appstate-snake state)))) BACKGROUNDPOS)   ; the possible positions' appstate is the same
       (appstate-game state)                                                                                              ; the game's appstate is the same
       (appstate-quit state))]                                                                                            ; the quit's appstate is the same
-    
     [(string=? key "r") (reset state)]                                                                                   ; reset the game
-    
     [(string=? key "escape") (quit state)]                                                                               ; quit the game
-    
     [else state]))                                                                                                     ; for any other input the appstate is the same
 
 ;;;;;;;;;; END ;;;;;;;;;;
