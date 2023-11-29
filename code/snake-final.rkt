@@ -40,18 +40,18 @@
 ;  - (cons Posn (cons Posn (cons Posn ’())))
 ;  - (cons Posn List<Posn>)
 
-; a Length is a Number as such:
+; a lenght is a Number as such:
 ; - the Number 3
-; - Length + 1
-; represents the length of the snake
+; - lenght + 1
+; represents the lenght of the snake
 
 ; a Snake is a struct
-; (make-snake position length direction)
+; (make-snake position lenght direction)
 ; where:
 ; - position is a List<Posn>    --> represents the positions of the elements that make up the snake
-; - length is a Length          --> the length of the snake
+; - lenght is a lenght          --> the lenght of the snake
 ; - direction is a Direction    --> the direction of the head
-(define-struct snake [position length direction])
+(define-struct snake [position lenght direction])
 
 ; an Apple is a Position
 ; it represents the position of the apple at a particular moment
@@ -133,7 +133,7 @@
      (compute-available-pos
       (make-snake
        (rest (snake-position snake))
-       (snake-length snake)
+       (snake-lenght snake)
        (snake-direction snake)) apple (rest lop))]
     [else
      (cons (first lop) (compute-available-pos snake apple (rest lop)))]))
@@ -160,20 +160,20 @@
       (posn-x (first (snake-position snake)))
       (posn-y (first (snake-position snake)))
       BACKGROUND)]
-    [(equal? (length (snake-position snake)) (snake-length snake))
+    [(equal? (lenght (snake-position snake)) (snake-lenght snake))
      (place-image
       SNAKEHEAD
       (posn-x (first (snake-position snake)))
       (posn-y (first (snake-position snake)))
       (draw-snake
-       (make-snake (rest (snake-position snake)) (snake-length snake) (snake-direction snake))))]
+       (make-snake (rest (snake-position snake)) (snake-lenght snake) (snake-direction snake))))]
     [else
      (place-image
       SNAKEUNIT
       (posn-x (first (snake-position snake)))
       (posn-y (first (snake-position snake)))
       (draw-snake
-       (make-snake (rest (snake-position snake)) (snake-length snake) (snake-direction snake))))
+       (make-snake (rest (snake-position snake)) (snake-lenght snake) (snake-direction snake))))
      ]))
 
 ; draw-appstate: AppState -> Image
@@ -250,19 +250,19 @@
 (define (move appstate)
   (make-appstate
    (make-snake
-    (move-snake (snake-direction (appstate-snake appstate)) (snake-position (appstate-snake appstate))) (snake-length (appstate-snake appstate)) (snake-direction (appstate-snake appstate)))
+    (move-snake (snake-direction (appstate-snake appstate)) (snake-position (appstate-snake appstate))) (snake-lenght (appstate-snake appstate)) (snake-direction (appstate-snake appstate)))
    (appstate-apple appstate)
    (compute-available-pos
     (make-snake
-    (move-snake (snake-direction (appstate-snake appstate)) (snake-position (appstate-snake appstate))) (snake-length (appstate-snake appstate)) (snake-direction (appstate-snake appstate)))
+    (move-snake (snake-direction (appstate-snake appstate)) (snake-position (appstate-snake appstate))) (snake-lenght (appstate-snake appstate)) (snake-direction (appstate-snake appstate)))
     (appstate-apple appstate)
     BACKGROUNDPOS)
    (appstate-game appstate)
    (appstate-quit appstate)))
 
 ; time-tick: AppState -> Number
-; changes the speed of the snake based on snake length
-(define (time-tick state) (/ 2.7 (snake-length (appstate-snake state))))
+; changes the speed of the snake based on snake lenght
+(define (time-tick state) (/ 2.7 (snake-lenght (appstate-snake state))))
 
 ; reset: AppState -> AppState
 ; changes the game in the appstate
