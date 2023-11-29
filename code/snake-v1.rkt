@@ -16,36 +16,41 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; IMAGES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; App BACKGROUND
-(define BACKGROUND (empty-scene 500 500 "black"))
 
-;(define Snake_back (rectangle 74 24 "solid" "white"))
-
-
-; a SnakeUnit is an Image
-; It represents the little rectangles that the snake is made off
-(define SNAKEUNIT (rectangle 24 24 "solid" "green"))
-
-; a SnakeHead is an Image
-; It represents the head of the snake with 'EYE' and 'TONGUE'
-; EYE
-(define EYE (circle 3 "solid" "black"))
-
-; tounge
-(define TONGUE (rectangle 3 10 "solid" "red"))
 
 ; head
-(define SNAKEHEAD (place-image EYE 7 12 (place-image EYE 17 12 (place-image TONGUE 12 3 SNAKEUNIT))))
+
+
+
+;; CONSTANTS
+; app scene background
+(define BACKGROUND (empty-scene 501 501 'black))
+
+; SnakeUnit
+(define SNAKEUNIT (rectangle 24 24 'solid 'green))
+
+; Elements to draw the SnakeHead
+; eye
+(define EYE (circle 3 'solid "black"))
+; tongue
+(define TONGUE (rectangle 10 3 'solid 'red))
+; head
+(define HEAD (put-image SNAKEUNIT 0 12 (circle 12 'solid 'green)))
+;snake head
+(define SNAKEHEAD (place-image EYE 10 8 (place-image EYE 10 16 (place-image TONGUE 20 12 HEAD))))
+; tail
+(define TAIL (put-image SNAKEUNIT 24 12 (circle 12 'solid 'green)))
+
+; AppleUnit
+(define APPLEUNIT (rectangle 24 24 'solid 'red))
+
+
+
 
 ; a SnakeDefault is an Image
 ; It represents the DEFAULT snake at the beginning of the game
 (define Snake_default (overlay/xy (rotate -90 SNAKEHEAD) -225 -225 (overlay/xy SNAKEUNIT -200 -225 (overlay/xy SNAKEUNIT -175 -225 BACKGROUND))))
-;(define Snake_default_2 (overlay/xy (rotate -90 SNAKEHEAD) -50 0 (overlay/xy SNAKEUNIT -25 0 (overlay/xy SNAKEUNIT 0 0 Snake_back))))
 
-
-; a APPLEUNIT is an Image
-; It represents the little rectangles that the apple is made off
-(define APPLEUNIT (rectangle 24 24 "solid" "red"))
 
 
 
@@ -550,10 +555,34 @@
 
 
 
+(check-expect (EATING (make-appstate (make-snake (make-posn -25 -25) 3 "up") (make-posn -25 -25) #false #false)) (make-appstate
+                                                                                                                  (make-snake (make-posn -25 -25) 4 "up")
+                                                                                                                  (make-posn 0 -25)
+                                                                                                                  #false
+                                                                                                                  #false))
+
+; eating the apple
+(define (EATING state)
+  (cond
+    [(or (equal? (posn-x (snake-position (appstate-snake state))) (posn-x (appstate-apple state)))
+         (equal? (posn-y (snake-position (appstate-snake state))) (posn-y (appstate-apple state))))
+     (make-appstate
+      (dimension (appstate-snake state))
+      Apple2
+      (appstate-game state)
+      (appstate-quit state))]
+    [else state]
+    ))
 
 
 
+
+; tick
 (define (time-tick state) (/ 2.7 (snake-length (appstate-snake state))))
+
+
+
+
 
 
 ;;;;;;;;;;;;;;;;;;;; END ;;;;;;;;;;;;;;;;;;;;
