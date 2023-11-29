@@ -34,12 +34,10 @@
 (define EYE (circle 3 'solid "black"))
 ; tongue
 (define TONGUE (rectangle 10 3 'solid 'red))
-(define TONGUE2 (rectangle 3 10 'solid 'red))
 ; head
 (define HEAD (put-image SNAKEUNIT 0 12 (circle 12 'solid 'green)))
 ;snake head
 (define SNAKEHEAD (place-image EYE 10 8 (place-image EYE 10 16 (place-image TONGUE 20 12 HEAD))))
-(define SNAKEHEAD2 (place-image EYE 7 12 (place-image EYE 17 12 (place-image TONGUE2 12 3 (rotate 90 HEAD)))))
 ; tail
 (define TAIL (put-image SNAKEUNIT 24 12 (circle 12 'solid 'green)))
 
@@ -51,8 +49,8 @@
 
 ; a SnakeDefault is an Image
 ; It represents the DEFAULT snake at the beginning of the game
-(define Snake_default (overlay/xy SNAKEHEAD -225 -225 (overlay/xy SNAKEUNIT -200 -225 (overlay/xy TAIL -175 -225 BACKGROUND))))
-(define Snake_default2 (overlay/xy (rotate -90 SNAKEHEAD2) -225 -225 (overlay/xy SNAKEUNIT -200 -225 (overlay/xy TAIL -175 -225 BACKGROUND))))
+(define Snake_default (overlay/xy (rotate -90 SNAKEHEAD) -225 -225 (overlay/xy SNAKEUNIT -200 -225 (overlay/xy SNAKEUNIT -175 -225 BACKGROUND))))
+
 
 
 
@@ -209,7 +207,7 @@
 
 
 (define (draw state)
-  (overlay/xy APPLEUNIT (posn-x Apple1) (posn-y Apple1) (overlay/xy SNAKEUNIT (x-cord (appstate-snake state)) (y-cord (appstate-snake state)) BACKGROUND)))
+  (overlay/xy APPLEUNIT (posn-x Apple2) (posn-y Apple2) (overlay/xy SNAKEUNIT (x-cord (appstate-snake state)) (y-cord (appstate-snake state)) BACKGROUND)))
 
 (define (x-cord snake)
   (posn-x (snake-position snake)))
@@ -298,47 +296,51 @@
 ;(define (change-snake-direction dir state)
 ;  (cond
 ;    [(string=? dir "up") ... state ...]
-;    [(string=? dir "left") ... state ...]
+;    [(string=? dir "right") ... state ...]
 ;    [(string=? dir "down") ... state ...]
-;    [(string=? dir "right") ... state ...]))
+;    [(string=? dir "left") ... state ...]))
 
 ; Code
 (define (change-snake-direction dir state)
   (cond
-    [(string=? dir "up") (make-appstate (update-snake-position dir (appstate-snake state)) (appstate-apple state) (appstate-game state) (appstate-quit state))]     ; change the direction to up
-    [(string=? dir "right") (make-appstate (update-snake-position dir (appstate-snake state)) (appstate-apple state) (appstate-game state) (appstate-quit state))]  ; change the direction to right
-    [(string=? dir "down") (make-appstate (update-snake-position dir (appstate-snake state)) (appstate-apple state) (appstate-game state) (appstate-quit state))]   ; change the direction to down
-    [(string=? dir "left") (make-appstate (update-snake-position dir (appstate-snake state)) (appstate-apple state) (appstate-game state) (appstate-quit state))])) ; change the direction to left
+    [(string=? dir "up") (make-appstate                            ; create new appstate where :
+                          (make-snake                               ; snake's
+                           (snake-position (appstate-snake state))   ;  position is the same
+                           (snake-length (appstate-snake state))     ;  length is the same
+                           "up")                                     ;  direction changed to up
+                          (appstate-apple state)                    ; apple's position is the same
+                          (appstate-game state)                     ; game's state is the same
+                          (appstate-quit state))]                   ; quit's state is the same
+    
+    [(string=? dir "right") (make-appstate                         ; create new appstate where :
+                          (make-snake                               ; snake's
+                           (snake-position (appstate-snake state))   ;  position is the same
+                           (snake-length (appstate-snake state))     ;  length is the same
+                           "right")                                  ;  direction changed to right
+                          (appstate-apple state)                    ; apple's position is the same
+                          (appstate-game state)                     ; game's state is the same
+                          (appstate-quit state))]                   ; quit's state is the same
+    
+    [(string=? dir "down") (make-appstate                          ; create new appstate where :
+                          (make-snake                               ; snake's
+                           (snake-position (appstate-snake state))   ;  position is the same
+                           (snake-length (appstate-snake state))     ;  length is the same
+                           "down")                                   ;  direction changed to down
+                          (appstate-apple state)                    ; apple's position is the same
+                          (appstate-game state)                     ; game's state is the same
+                          (appstate-quit state))]                   ; quit's state is the same
+    
+    [(string=? dir "left") (make-appstate                          ; create new appstate where :
+                          (make-snake                               ; snake's
+                           (snake-position (appstate-snake state))   ;  position is the same
+                           (snake-length (appstate-snake state))     ;  length is the same
+                           "left")                                   ;  direction changed to left
+                          (appstate-apple state)                    ; apple's position is the same
+                          (appstate-game state)                     ; game's state is the same
+                          (appstate-quit state))]))                 ; quit's state is the same
 
 
 
-;;;;;;;;;; UPDATE SNAKE DIRECTION ;;;;;;;;;;
-
-; update-snake-position : Direction Snake -> Snake
-; updates snake position based on snake direction
-
-; Examples
-(check-expect (update-snake-position "up" Snake2) (make-snake (make-posn -26 -26) 4 "up"))
-(check-expect (update-snake-position "right" Snake4) (make-snake (make-posn -52 -26) 6 "right"))
-(check-expect (update-snake-position "down" Snake1) (make-snake (make-posn -26 -26) 3 "down"))
-(check-expect (update-snake-position "left" Snake3) (make-snake (make-posn -26 -52) 5 "left"))
-(check-expect (update-snake-position "up" Snake5) (make-snake (make-posn -1 -1) 3 "up"))
-
-; Template
-;(define (update-snake-position dir snake)
-;  (cond
-;    [(string=? dir "up") ... snake ...]
-;    [(string=? dir "left") ... snake ...]
-;    [(string=? dir "right") ... snake ...]
-;    [(string=? dir "down") ... snake ...]
-
-; Code
-(define (update-snake-position dir snake)
-  (cond
-    [(string=? dir "up") (make-snake (snake-position snake) (snake-length snake) "up")]        ; change the direction to up
-    [(string=? dir "right") (make-snake (snake-position snake) (snake-length snake) "right")]  ; change the direction to right
-    [(string=? dir "down") (make-snake (snake-position snake) (snake-length snake) "down")]    ; change the direction to down
-    [(string=? dir "left") (make-snake (snake-position snake) (snake-length snake) "left")]))  ; change the direction to left
 
 
 ;;;;;;;;;; RESET ;;;;;;;;;;
@@ -637,5 +639,5 @@
   (big-bang AppState
     [to-draw draw]             ; draw the snake
     [on-key handle-keyboard]   ; change snake's direction or reset game or quit the game
-    [on-tick move-snake 0.2];  (time-tick AppState)]  ; uptade snake's position and "time" incrase each tick
+    [on-tick move-snake 0.2] ;(time-tick AppState)]  ; uptade snake's position and "time" incrase each tick
     [stop-when end?]))         ; quit the application
