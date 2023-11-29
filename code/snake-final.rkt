@@ -456,8 +456,8 @@
 (define (snake-game appstate)
   (big-bang appstate
     [to-draw draw-appstate]                                      ; draw the snake
-    [on-key handle-keyboard]                                    ; change snake's direction or reset game or quit the game
-    [on-tick move 0.2]; (time-tick appstate)]                 ; uptade snake's position and "time" incrase each tick
+    [on-key handle-keyboard]                                     ; change snake's direction or reset game or quit the game
+    [on-tick move 0.2]; (time-tick appstate)]                    ; uptade snake's position and "time" incrase each tick
     ;[display-mode 'fullscreen]
-    [stop-when end?]                                            ; quit the application
+    [stop-when end?]                                             ; quit the application
     ))                          
