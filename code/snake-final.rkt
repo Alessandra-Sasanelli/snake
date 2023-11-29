@@ -156,13 +156,13 @@
   (cond
     [(empty? (rest (snake-position snake)))
      (place-image
-      TAIL
+      SNAKEHEAD
       (posn-x (first (snake-position snake)))
       (posn-y (first (snake-position snake)))
       BACKGROUND)]
     [(equal? (length (snake-position snake)) (snake-length snake))
      (place-image
-      SNAKEHEAD
+      TAIL
       (posn-x (first (snake-position snake)))
       (posn-y (first (snake-position snake)))
       (draw-snake
@@ -445,7 +445,7 @@
 ;;;;;;;;;; MAIN APPLICATIONS ;;;;;;;;;;
 
 ; the first Snake
-(define SNAKE1 (make-snake (list (make-posn 63 13) (make-posn 38 13) (make-posn 13 13)) 3 RIGHT))
+(define SNAKE1 (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 RIGHT))
 
 ; the first example of an Apple
 (define APPLE1 (compute-apple-position (random 401) 1 (compute-available-pos SNAKE1 (make-posn 0 0) BACKGROUNDPOS)))
