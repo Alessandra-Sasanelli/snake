@@ -38,4 +38,4 @@ MILESTONE
     - discussed on the background for the game
     - discussed on having a the entry for the game when starting the application
     - discussed on the apple style for the game
-    - discussed on tracking the points for the game (based on the snake-length)m
+    - discussed on tracking the points for the game (based on the snake-length)
