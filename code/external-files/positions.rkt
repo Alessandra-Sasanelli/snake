@@ -101,10 +101,10 @@
 ; checks wheather the given posn is into backgroundpos
 ; Header (define (check-position-out pos lop) #false)
 
-;Examples
+; Examples
 (check-expect (check-position-out (make-posn 363 88) BACKGROUNDPOS) #false)
 (check-expect (check-position-out (make-posn 463 63) BACKGROUNDPOS) #false)
-;the left limit
+; the left limit
 (check-expect (check-position-out (make-posn 13 13) BACKGROUNDPOS) #false)
 (check-expect (check-position-out (make-posn -12 13) BACKGROUNDPOS) #true)
 ; the right limit

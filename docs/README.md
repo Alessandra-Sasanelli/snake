@@ -4,6 +4,17 @@ by Alessandra Sasanelli and Simone Maccario
 
 MILESTONE
 -------------------------------------------
+    CHANGES FROM THE PROPOSAL
+    - added a new datatype called Breakpoint
+    - added new field breakpositions to the snake struct
+    - definition of List<Posn> changed
+    - AVAILABLEPOSITIONS changed name to BACKGROUNDPOS 
+      (now is just the collection of all the positions on the background)
+    - Position data type has not been defined
+    - We didn't implement the function draw-apple; we have incorporated it
+      into the draw-appstate
+    - update-snake-position now called update-positions
+
     FUNCTIONS FOR THE POSITIONS
     - implemented function to compute background positions
     - implemented function to compute available positions
@@ -12,7 +23,8 @@ MILESTONE
     - implemented function to decrement a posn coordinate
     - implemented function to update a posn based on the direction
     - implemented function to cut useless breakpoints
-    - implemented function to check if a posn is before or after a breakpoint (to be fixed)
+    - implemented function to check if a posn is before or after a breakpoint 
+      (to be fixed)
     - implemented function to update a posn based on direction and List<Breakpoint>
     - implemented function to update a List<Posn> based on direction and List<Breakpoint>
     
