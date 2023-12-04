@@ -380,4 +380,5 @@
     [(empty? lob) lob]
     [(< (- n 2) (length lob)) (cut-breakpoints n pos (reverse (rest (reverse lob))))]
     [(equal? pos (first (reverse lob))) (cut-breakpoints n pos (reverse (rest (reverse lob))))]
+    [(and (empty? (rest lob)) (equal? pos (first lob))) '()]
     [else lob]))
