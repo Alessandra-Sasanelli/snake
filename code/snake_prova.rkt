@@ -572,8 +572,8 @@
                                       (snake-breakpoint (appstate-snake DEFAULT))))
                           (make-snake (list (make-posn 38 113) (make-posn 63 113) (make-posn 88 113) (make-posn 113 113) (make-posn 138 113)) 5 RIGHT '()))
               
-(check-expect (move-snake (make-snake (list (make-posn 13 38) (make-posn 13 63) (make-posn 13  88)) 3 UP '()))
-              (make-snake (list (make-posn 13 13) (make-posn 13 38) (make-posn 13 63)) 3 UP '()))
+(check-expect (move-snake (make-snake (list (make-posn 13 88) (make-posn 13 63) (make-posn 13  38)) 3 UP '()))
+              (make-snake (list (make-posn 13 63) (make-posn 13 38) (make-posn 13 13)) 3 UP '()))
 
 (check-expect (move-snake (make-snake (list (make-posn 13 38) (make-posn 38 38) (make-posn 63  38)) 3 RIGHT '()))
               (make-snake (list (make-posn 38 38) (make-posn 63 38) (make-posn 88 38)) 3 RIGHT '()))
@@ -581,8 +581,8 @@
 (check-expect (move-snake (make-snake (list (make-posn 13 38) (make-posn 13 63) (make-posn 13  88)) 3 DOWN '()))
               (make-snake (list (make-posn 13 63) (make-posn 13 88) (make-posn 13 113)) 3 DOWN '()))
 
-(check-expect (move-snake (make-snake (list (make-posn 38 38) (make-posn 63 38) (make-posn 88  38)) 3 LEFT '()))
-              (make-snake (list (make-posn 13 38) (make-posn 38 38) (make-posn 63 38)) 3 LEFT '()))
+(check-expect (move-snake (make-snake (list (make-posn 88 38) (make-posn 63 38) (make-posn 38  38)) 3 LEFT '()))
+              (make-snake (list (make-posn 63 38) (make-posn 38 38) (make-posn 13 38)) 3 LEFT '()))
 
 ; Code
 (define (move-snake snake)
@@ -605,12 +605,12 @@
                               QUIT-F))
 
 (check-expect (move (make-appstate
-                     (make-snake (list (make-posn 13 38) (make-posn 13 63) (make-posn 13  88)) 3 UP '())
+                     (make-snake (list (make-posn 13 88) (make-posn 13 63) (make-posn 13  38)) 3 UP '())
                      APPLE1
                      GAME-T
                      QUIT-F))
               (make-appstate
-               (make-snake (list (make-posn 13 13) (make-posn 13 38) (make-posn 13 63)) 3 UP '())
+               (make-snake (list (make-posn 13 63) (make-posn 13 38) (make-posn 13 13)) 3 UP '())
                APPLE1
                GAME-T
                QUIT-F))
@@ -638,12 +638,12 @@
                QUIT-F))
 
 (check-expect (move (make-appstate
-                     (make-snake (list (make-posn 38 38) (make-posn 63 38) (make-posn 88  38)) 3 LEFT '())
+                     (make-snake (list (make-posn 88 38) (make-posn 63 38) (make-posn 38  38)) 3 LEFT '())
                      APPLE1
                      GAME-T
                      QUIT-F))
               (make-appstate
-               (make-snake (list (make-posn 13 38) (make-posn 38 38) (make-posn 63 38)) 3 LEFT '())
+               (make-snake (list (make-posn 63 38) (make-posn 38 38) (make-posn 13 38)) 3 LEFT '())
                APPLE1
                GAME-T
                QUIT-F))

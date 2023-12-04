@@ -45,6 +45,11 @@
          y                                                                                    ; the y is the same
          (cons (make-posn (+ (* 12 (+ (* x 2) 1)) (+ x 1)) (posn-y (first lop))) lop))])]))   ; new lop wih new posn
 
+
+(define-struct snake [position length direction breakpoint])
+(define SNAKE1 (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 RIGHT '()))
+(define BACKGROUNDPOS (make-positions 1 1 1 (list (make-posn 13 13))))
+
 ;;;;;;;;;; INCREMENT POSN ;;;;;;;;;;
 ; increment-pos: Number -> Number
 ; increments the x or the y position of a posn
