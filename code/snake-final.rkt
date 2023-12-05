@@ -115,7 +115,7 @@
 (define BACKGROUNDPOS (make-positions 1 1 1 (list (make-posn 13 13))))
 
 ; the first Snake
-(define SNAKE1 (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13) (make-posn 88 13) (make-posn 113 13)) 5 RIGHT))
+(define SNAKE1 (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 RIGHT))
 
 ; the first example of an Apple
 (define APPLE1 (compute-apple-position (random 401) 1 (compute-available-pos (cons (make-posn 0 0)(snake-position SNAKE1)) BACKGROUNDPOS)))
@@ -281,11 +281,10 @@
                                                                (snake-length SNAKE1)
                                                                DOWN
                                                                ))
-(check-expect (change-snake-direction LEFT (make-snake (list (make-posn 13 13) (make-posn 13 63) (make-posn 13 88)) 3 DOWN '()))
+(check-expect (change-snake-direction LEFT (make-snake (list (make-posn 13 13) (make-posn 13 63) (make-posn 13 88)) 3 DOWN))
               (make-snake (list (make-posn 13 13) (make-posn 13 63) (make-posn 13 88))
                           3
-                          LEFT
-                          ))
+                          LEFT))
 (check-expect (change-snake-direction " " SNAKE1) SNAKE1)
 
 ; Code 
@@ -323,8 +322,8 @@
 (check-expect (move-snake (make-snake (list (make-posn 13 88) (make-posn 13 63) (make-posn 13  38)) 3 UP))
               (make-snake (list (make-posn 13 63) (make-posn 13 38) (make-posn 13 13)) 3 UP))
 
-(check-expect (move-snake (make-snake (list (make-posn 38 38) (make-posn 63 38) (make-posn 88 38)) 3 LEFT))
-              (make-snake (list (make-posn 63 38) (make-posn 38 38) (make-posn 63 38)) 3 LEFT))
+(check-expect (move-snake (make-snake (list (make-posn 38 38) (make-posn 63 38) (make-posn 88 38)) 3 RIGHT))
+              (make-snake (list (make-posn 63 38) (make-posn 88 38) (make-posn 113 38)) 3 RIGHT)) 
 
 ; Code
 (define (move-snake snake)
@@ -816,7 +815,7 @@
 (define (end? state)
   (cond
     [(check-position-out (last (snake-position (appstate-snake state))) BACKGROUNDPOS) #true] ; if the snake is over background's limits, the application turn off
-    [(and (> (snake-length (appstate-snake state)) 3) (check-eat-snake state)) #true]                                                           ; if the snake hits itself, the application turn off
+    [(and (> (snake-length (appstate-snake state)) 3) (check-eat-snake state)) #true]         ; if the snake hits itself, the application turn off
     [(boolean=? (appstate-quit state) #false) #false]                                         ; the application remains on
     [else #true]))                                                                            ; for any other case the application turn off
 
@@ -829,6 +828,6 @@
   (big-bang appstate
     [to-draw draw-appstate]                                  ; draw the snake and apple on the background
     [on-key handle-keyboard]                                 ; change snake's direction or reset game or quit the game
-    [on-tick move 0.2]; (time-tick appstate)]                ; uptade snake's position and "time" incrase each tick
+    [on-tick move (time-tick appstate)]                ; uptade snake's position and "time" incrase each tick
     ;[display-mode 'fullscreen]                              ; the display automatically becomes full screen
     [stop-when end?]))                                       ; quit the application
