@@ -292,7 +292,7 @@
      (or (> (posn-x pos) (posn-x br))                             ;
          (and (equal? last UP) (< (posn-y pos) (posn-y br)))      ;
          (and (equal? last DOWN) (> (posn-y pos) (posn-y br))))]  ;
-    [else #false]))                                               ;
+    [else #true]))                                                ;
 
 
 ;;;;;;;;;; COMPUTE POSN DIRECTION ON BREAKPOINTS ;;;;;;;;;;
@@ -321,14 +321,18 @@
   (cond
     [(empty? lob) (compute-new-posn pos d)]                                                      ;
     [(equal? pos (first lob)) (compute-new-posn pos d)]                                          ;
-    [(and (equal? (posn-x pos) (posn-x (first lob))) (not (posn-after? last d pos (first lob)))) ;
+    [(and (equal? (posn-x pos) (posn-x (first lob)))
+          (not (posn-after? last d pos (first lob)))
+          (not (string=? last d)))                                                                 ;
      (cond
        [(< (posn-y (first lob)) (posn-y pos))                                                    ;
         (compute-new-posn pos UP)]                                                               ;
        [(> (posn-y (first lob)) (posn-y pos))                                                    ;
         (compute-new-posn pos DOWN)]                                                             ;
        [else pos])]                                                                              ;
-    [(and (equal? (posn-y pos) (posn-y (first lob))) (not (posn-after? last d pos (first lob)))) ;
+    [(and (equal? (posn-y pos) (posn-y (first lob)))
+          (not (posn-after? last d pos (first lob)))
+          (not (string=? last d)))                                                                 ;
      (cond
        [(< (posn-x (first lob)) (posn-x pos))                                                    ;
         (compute-new-posn pos LEFT)]                                                             ;
