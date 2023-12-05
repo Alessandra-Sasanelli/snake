@@ -16,7 +16,8 @@
          QUIT-F
          last)
 
-;;;;;;;;;;;;; DATA TYPE ;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;; DATA TYPES ;;;;;;;;;;;;;;;;;;;;
 ; a Direction is one of these String
 ; - "up"
 ; - "left"
@@ -47,6 +48,9 @@
 ; the quit
 (define QUIT-T #true)
 (define QUIT-F #false)
+
+;;;;;;;;;;;;;;;;;;;; FUNCTIONS ;;;;;;;;;;;;;;;;;;;;
+
 
 ;;;;;;;;;; LAST ;;;;;;;;;;
 ; last: List<Any> -> List<Any>

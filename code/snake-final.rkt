@@ -14,6 +14,7 @@
 (require "external-files/positions.rkt")
 (require "external-files/generals.rkt")
 
+
 ;;;;;;;;;;;;;;;;;;;; DATA TYPES ;;;;;;;;;;;;;;;;;;;;
 ; an AppleUnit is an Image
 ; It represents the little rectangles that the apple is made off
@@ -30,6 +31,7 @@
 ; - quit is a Quit
 (define-struct appstate [snake apple game quit])
 
+
 ;;;;;;;;;;;;;;;;;;;; CONSTANTS ;;;;;;;;;;;;;;;;;;;;
 ; AppleUnit
 (define APPLEUNIT (bitmap "../resources/apple.png"))
@@ -37,7 +39,10 @@
 ; the first example of an Apple
 (define APPLE1 (compute-apple-position (random 401) 1 (compute-available-pos (cons (make-posn 0 0)(snake-position SNAKE1)) BACKGROUNDPOS)))
 
+
 ;;;;;;;;;;;;;;;;;;;; FUNCTIONS ;;;;;;;;;;;;;;;;;;;;
+
+
 ;;;;;;;;;; DRAW APPSTATE ;;;;;;;;;;
 ; draw-appstate: AppState -> Image
 ; draws the appstate
@@ -85,6 +90,7 @@
                (posn-x (appstate-apple state))         ; x coordinate
                (posn-y (appstate-apple state))         ; y coordinate
                (draw-snake (appstate-snake state))))   ; a Snake call its own function to draw itself
+
 
 ;;;;;;;;;; MOVE ;;;;;;;;;;
 ; move: AppState -> AppState
@@ -143,11 +149,11 @@
                QUIT-F))
 
 ; Code
-(define (move appstate) (make-appstate
-                         (move-snake (appstate-snake appstate))
-                         (appstate-apple appstate)
-                         (appstate-game appstate)
-                         (appstate-quit appstate)))
+(define (move appstate) (make-appstate                          ; every tick the appstate is moved and it creates a new update where it is made by :
+                         (move-snake (appstate-snake appstate))   ; the new position of the snake
+                         (appstate-apple appstate)                ; the apple's state is the same
+                         (appstate-game appstate)                 ; the game's state is the same
+                         (appstate-quit appstate)))               ; the quit's state is the same
 
 
 ;;;;;;;;;; TICK ;;;;;;;;;;
@@ -416,25 +422,26 @@
 ; Code
 (define (handle-keyboard state key)
   (cond
-    [(not (string? key)) state]                                                                                        ; for any possible not-string key input, the output is the same AppState as before
+    [(not (string? key)) state]                                                                          ; for any possible not-string key input, the output is the same AppState as before
     
-    [(or (and (string=? key "up") (string=? (snake-direction (appstate-snake state)) "down"))                          ; if the direction is opposite of the key, the state is the same
-         (and (string=? key "right") (string=? (snake-direction (appstate-snake state)) "left"))                       ; if the direction is opposite of the key, the state is the same
-         (and (string=? key "down") (string=? (snake-direction (appstate-snake state)) "up"))                          ; if the direction is opposite of the key, the state is the same
-         (and (string=? key "left") (string=? (snake-direction (appstate-snake state)) "right"))) state]               ; if the direction is opposite of the key, the state is the same 
+    [(or (and (string=? key "up") (string=? (snake-direction (appstate-snake state)) "down"))            ; if the direction is opposite of the key, the state is the same
+         (and (string=? key "right") (string=? (snake-direction (appstate-snake state)) "left"))        
+         (and (string=? key "down") (string=? (snake-direction (appstate-snake state)) "up"))           
+         (and (string=? key "left") (string=? (snake-direction (appstate-snake state)) "right"))) state]
 
-    [(or (string=? key "up") (string=? key "right") (string=? key "down") (string=? key "left"))                       ; if the input is one of 'up', 'right', 'down' or 'left'
-     (make-appstate                                                                                                    ; create a new appstate where :
-      (change-snake-direction key (appstate-snake state))                                                                ; the new snake is returned by the fuction to change the snake;'s direction
-      (appstate-apple state)                                                                                             ; the apple's appstate is the same
-      (appstate-game state)                                                                                              ; the game's appstate is the same
-      (appstate-quit state))]                                                                                            ; the quit's appstate is the same
+    [(or (string=? key "up") (string=? key "right") (string=? key "down") (string=? key "left"))         ; if the input is one of 'up', 'right', 'down' or 'left'
+     (make-appstate                                                                                      ; create a new appstate where :
+      (change-snake-direction key (appstate-snake state))                                                  ; the new snake is returned by the function to change the snake's direction
+      (appstate-apple state)                                                                               ; the apple's appstate is the same
+      (appstate-game state)                                                                                ; the game's appstate is the same
+      (appstate-quit state))]                                                                              ; the quit's appstate is the same
 
-    [(string=? key "r") (reset state)]                                                                                   ; reset the game
+    [(string=? key "r") (reset state)]                                                                   ; reset the game
 
-    [(string=? key "escape") (quit state)]                                                                               ; quit the game
+    [(string=? key "escape") (quit state)]                                                               ; quit the game
 
-    [else state]))                                                                                                     ; for any other input the appstate is the same
+    [else state]))                                                                                       ; for any other input the appstate is the same
+
 
 ;;;;;;;;;; END ;;;;;;;;;;
 ; end?: AppState -> Boolean
@@ -444,15 +451,15 @@
 ; Example
 (check-expect (end? DEFAULT) #false)
 (check-expect (end? (make-appstate SNAKE1 APPLE1 GAME-T QUIT-T)) #true)
-;the left limit
+; the top limit
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 LEFT)
+                     (make-snake (list (make-posn 13 13) (make-posn 13 38) (make-posn 13 63)) 3 UP)
                      APPLE1
                      GAME-T
                      QUIT-F))
               #false)
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 38 13) (make-posn 13 13) (make-posn -12 13)) 3 LEFT)
+                     (make-snake (list (make-posn 13 38) (make-posn 13 13) (make-posn 13 -12)) 3 UP)
                      APPLE1
                      GAME-T
                      QUIT-F))
@@ -470,19 +477,6 @@
                      GAME-T
                      QUIT-F))
               #true)
-; the top limit
-(check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 13 13) (make-posn 13 38) (make-posn 13 63)) 3 UP)
-                     APPLE1
-                     GAME-T
-                     QUIT-F))
-              #false)
-(check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 13 38) (make-posn 13 13) (make-posn 13 -12)) 3 UP)
-                     APPLE1
-                     GAME-T
-                     QUIT-F))
-              #true)
 ; the bottom limit
 (check-expect (end? (make-appstate
                      (make-snake (list (make-posn 13 488) (make-posn 13 463) (make-posn 13 438)) 3 DOWN)
@@ -492,6 +486,19 @@
               #false)
 (check-expect (end? (make-appstate
                      (make-snake (list (make-posn 13 463) (make-posn 13 488) (make-posn 13 513)) 3 DOWN)
+                     APPLE1
+                     GAME-T
+                     QUIT-F))
+              #true)
+;the left limit
+(check-expect (end? (make-appstate
+                     (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 LEFT)
+                     APPLE1
+                     GAME-T
+                     QUIT-F))
+              #false)
+(check-expect (end? (make-appstate
+                     (make-snake (list (make-posn 38 13) (make-posn 13 13) (make-posn -12 13)) 3 LEFT)
                      APPLE1
                      GAME-T
                      QUIT-F))
@@ -523,9 +530,10 @@
 (define (end? state)
   (cond
     [(check-position-out (last (snake-position (appstate-snake state))) BACKGROUNDPOS) #true] ; if the snake is over background's limits, the application turn off
-    [(and (> (snake-length (appstate-snake state)) 3) (check-eat-snake (appstate-snake state))) #true]         ; if the snake hits itself, the application turn off
+    [(check-eat-snake (appstate-snake state)) #true]                                          ; if the snake hits itself, the application turn off
     [(boolean=? (appstate-quit state) #false) #false]                                         ; the application remains on
     [else #true]))                                                                            ; for any other case the application turn off
+
 
 ;;;;;;;;;; MAIN APPLICATIONS ;;;;;;;;;;
 ; the default AppState

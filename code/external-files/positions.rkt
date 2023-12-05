@@ -17,7 +17,8 @@
          direction-by-posn
          compute-apple-position)
 
-;;;;;;;;;; DATA TYPE ;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;; DATA TYPES ;;;;;;;;;;;;;;;;;;;;
 ; a List<Posn> is one of:
 ;  - '()
 ;  - (cons Posn List<Posn>)
@@ -26,6 +27,10 @@
 ; Snake struct and one example
 (define-struct snake [position length direction])
 (define SNAKE1 (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 RIGHT))
+
+
+;;;;;;;;;;;;;;;;;;;; FUNCTIONS ;;;;;;;;;;;;;;;;;;;;
+
 
 ;;;;;;;;;; MAKE POSITIONS ;;;;;;;;;;
 ; make-positions: Number Number Number List<Posn> -> List<Posn>
@@ -205,12 +210,12 @@
 
 ; Code
 (define (compute-new-posn pos dir)
-  (cond
-    [(equal? dir UP) (make-posn (posn-x pos) (decrement-pos (posn-y pos)))]
-    [(equal? dir DOWN) (make-posn (posn-x pos) (increment-pos (posn-y pos)))]
-    [(equal? dir RIGHT) (make-posn (increment-pos (posn-x pos)) (posn-y pos))]
-    [(equal? dir LEFT) (make-posn (decrement-pos (posn-x pos)) (posn-y pos))]
-    [else pos]))
+  (cond                                                                        ; every tick it update the position in according with the input is a direction, and if it is :
+    [(equal? dir UP) (make-posn (posn-x pos) (decrement-pos (posn-y pos)))]     ; up, it drecreas the y
+    [(equal? dir RIGHT) (make-posn (increment-pos (posn-x pos)) (posn-y pos))]  ; right, increase the x
+    [(equal? dir DOWN) (make-posn (posn-x pos) (increment-pos (posn-y pos)))]   ; down, increase the y
+    [(equal? dir LEFT) (make-posn (decrement-pos (posn-x pos)) (posn-y pos))]   ; left, decrease the x
+    [else pos]))                                                               ; otherwise ii returns the original position
 
 
 ;;;;;;;;;; DIRECTION BY POSITION ;;;;;;;;;;
@@ -223,14 +228,16 @@
 (check-expect (direction-by-posn (make-posn 13 38) (make-posn 38 38)) RIGHT)
 (check-expect (direction-by-posn (make-posn 13 13) (make-posn 13 38)) DOWN)
 (check-expect (direction-by-posn (make-posn 38 38) (make-posn 13 38)) LEFT)
+(check-expect (direction-by-posn (make-posn 38 38) (make-posn 38 13)) UP)
 
 ; Code
 (define (direction-by-posn posb posa)
-  (cond
-    [(< (posn-y posa) (posn-y posb)) UP]
-    [(> (posn-x posa) (posn-x posb)) RIGHT]
-    [(> (posn-y posa) (posn-y posb)) DOWN]
-    [(< (posn-x posa) (posn-x posb)) LEFT]))
+  (cond                                      ; if the x or y of two positions are:
+    [(< (posn-y posa) (posn-y posb)) UP]      ; the first one y is less the second, the direction is up
+    [(> (posn-x posa) (posn-x posb)) RIGHT]   ; the first one x is greater the second, the direction is right
+    [(> (posn-y posa) (posn-y posb)) DOWN]    ; the first one y is greater the second, the direction is down
+    [(< (posn-x posa) (posn-x posb)) LEFT]))  ; the first one x is less the second, the direction is left
+
 
 ;;;;;;;;;; UPDATE-POSITIONS ;;;;;;;;;;
 ; update-positions: Direction List<Posn> -> List<Posn>
@@ -247,6 +254,6 @@
 ; Code
 (define (update-positions d lop)
   (cond
-    [(empty? (rest lop)) (cons (compute-new-posn (first lop) d) '())]
+    [(empty? (rest lop)) (cons (compute-new-posn (first lop) d) '())]                                                      ; base case where the list is over create a new position
     [else
-     (cons (compute-new-posn (first lop) (direction-by-posn (first lop) (second lop))) (update-positions d (rest lop)))]))
+     (cons (compute-new-posn (first lop) (direction-by-posn (first lop) (second lop))) (update-positions d (rest lop)))])) ; recursive case with new position for first element and pass the rest of the snake
