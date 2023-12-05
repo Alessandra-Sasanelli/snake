@@ -180,9 +180,9 @@
 ; Header (define (move-snake d lop) lop)
 
 ; Examples
-(check-expect (move-snake (make-snake (snake-position (appstate-snake DEFAULT))
-                                      (snake-length (appstate-snake DEFAULT))
-                                      (snake-direction (appstate-snake DEFAULT))
+(check-expect (move-snake (make-snake (snake-position SNAKE1)
+                                      (snake-length SNAKE1)
+                                      (snake-direction SNAKE1)
                                       ))
                           (make-snake (list (make-posn 38 13) (make-posn 63 13) (make-posn 88 13)) 3 RIGHT))
 
@@ -213,27 +213,19 @@
 ; Header (define (check-eat-snake state) #true)
 
 ; Examples
-(check-expect (check-eat-snake DEFAULT) #false)
-(check-expect (check-eat-snake (make-appstate
+(check-expect (check-eat-snake SNAKE1) #false)
+(check-expect (check-eat-snake 
                                 (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 438 38) (make-posn 463 38) (make-posn 463 63)) 5 DOWN)
-                                APPLE1
-                                GAME-T
-                                QUIT-F)) #true)
-(check-expect (check-eat-snake (make-appstate
+                                ) #true)
+(check-expect (check-eat-snake 
                                 (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 438 38) (make-posn 463 38) (make-posn 463 13)) 5 UP)
-                                APPLE1
-                                GAME-T
-                                QUIT-F)) #false)
-(check-expect (check-eat-snake (make-appstate
+                                ) #false)
+(check-expect (check-eat-snake 
                                 (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63) (make-posn 413 88) (make-posn 438 88) (make-posn 438 63)) 6 UP)
-                                APPLE1
-                                GAME-T
-                                QUIT-F)) #true)
-(check-expect (check-eat-snake (make-appstate
+                                ) #true)
+(check-expect (check-eat-snake 
                                 (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63) (make-posn 388 63) (make-posn 363 63)) 5 LEFT)
-                                APPLE1
-                                GAME-T
-                                QUIT-F)) #false)
+                                ) #false)
 
 ; Code
 (define (check-eat-snake snake)
