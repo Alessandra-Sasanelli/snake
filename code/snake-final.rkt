@@ -50,14 +50,6 @@
 ;  - (cons Posn List<Posn>)
 ; represents a list of positions
 
-; a Breakpoint is a Posn
-; it represents the positions where the player changed direction to the Snake
-
-; a List<Breakpoint> is one of:
-; - '()                                  --> the empty list 
-; - (cons Breakpoint List<Breakpoint>)   --> recursive case
-; represents a list of breakpoints
-
 ; a Length is a Number as such:
 ; - the Number 3
 ; - Length + 1
@@ -69,8 +61,7 @@
 ; - position is a List<Posn>           --> represents the positions of the elements that make up the snake
 ; - length is a Length                 --> the length of the snake
 ; - direction is a Direction           --> the direction of the head
-; - breakpoint is a List<Breakpoints>  --> list of the points where the snake's direction changed
-(define-struct snake [position length direction breakpoint])
+(define-struct snake [position length direction])
 
 ; an Apple is a Position
 ; it represents the position of the apple at a particular moment
@@ -83,10 +74,6 @@
 ; - game is a Game
 ; - quit is a Quit
 (define-struct appstate [snake apple game quit])
-
-
-
-
 
 ;;;;;;;;;;;;;;;;;;;; CONSTANTS ;;;;;;;;;;;;;;;;;;;;
 ; app scene background
@@ -128,7 +115,7 @@
 (define BACKGROUNDPOS (make-positions 1 1 1 (list (make-posn 13 13))))
 
 ; the first Snake
-(define SNAKE1 (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 RIGHT '()))
+(define SNAKE1 (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13) (make-posn 88 13) (make-posn 113 13)) 5 RIGHT))
 
 ; the first example of an Apple
 (define APPLE1 (compute-apple-position (random 401) 1 (compute-available-pos (cons (make-posn 0 0)(snake-position SNAKE1)) BACKGROUNDPOS)))
@@ -190,16 +177,16 @@
 ; Examples
 (check-expect (draw-snake SNAKE1) (place-image SNAKEHEAD 63 13 (place-image SNAKEUNIT 38 13 (place-image TAIL 13 13 BACKGROUND))))
 
-(check-expect (draw-snake (make-snake (list (make-posn 363 113) (make-posn 388 113) (make-posn 413 113)) 3 RIGHT '()))
+(check-expect (draw-snake (make-snake (list (make-posn 363 113) (make-posn 388 113) (make-posn 413 113)) 3 RIGHT))
               (place-image TAIL 363 113 (place-image SNAKEUNIT 388 113 (place-image SNAKEHEAD 413 113 BACKGROUND))))
 
-(check-expect (draw-snake (make-snake (list (make-posn 113 113) (make-posn 138 113) (make-posn 163 113) (make-posn 188 113)) 4 RIGHT '()))
+(check-expect (draw-snake (make-snake (list (make-posn 113 113) (make-posn 138 113) (make-posn 163 113) (make-posn 188 113)) 4 RIGHT))
               (place-image TAIL 113 113 (place-image SNAKEUNIT 163 113 (place-image SNAKEUNIT 138 113 (place-image SNAKEHEAD 188 113 BACKGROUND)))))
 
-(check-expect (draw-snake (make-snake (list (make-posn 313 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 263 88)) 5 RIGHT '()))
+(check-expect (draw-snake (make-snake (list (make-posn 313 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 263 88)) 5 RIGHT))
               (place-image TAIL 313 88 (place-image SNAKEUNIT 338 88 (place-image SNAKEUNIT 313 88 (place-image SNAKEUNIT 288 88 (place-image SNAKEHEAD 263 88 BACKGROUND))))))
 
-(check-expect (draw-snake (make-snake (list (make-posn 413 63) (make-posn 438 63) (make-posn 463 63)) 3 RIGHT '()))
+(check-expect (draw-snake (make-snake (list (make-posn 413 63) (make-posn 438 63) (make-posn 463 63)) 3 RIGHT))
               (place-image TAIL 413 63 (place-image SNAKEUNIT 438 63 (place-image SNAKEHEAD 463 63 BACKGROUND))))
 
 ; Code
@@ -217,14 +204,14 @@
       (posn-x (first (snake-position snake)))
       (posn-y (first (snake-position snake)))
       (draw-snake
-       (make-snake (rest (snake-position snake)) (snake-length snake) (snake-direction snake) (snake-breakpoint snake))))]
+       (make-snake (rest (snake-position snake)) (snake-length snake) (snake-direction snake))))]
     [else
      (place-image
       SNAKEUNIT
       (posn-x (first (snake-position snake)))
       (posn-y (first (snake-position snake)))
       (draw-snake
-       (make-snake (rest (snake-position snake)) (snake-length snake) (snake-direction snake) (snake-breakpoint snake))))]))
+       (make-snake (rest (snake-position snake)) (snake-length snake) (snake-direction snake))))]))
 
 
 ;;;;;;;;;; DRAW APPSTATE ;;;;;;;;;;
@@ -234,28 +221,28 @@
 
 ; Examples
 (check-expect (draw-appstate (make-appstate
-                              (make-snake (list (make-posn 363 113) (make-posn 388 113) (make-posn 413 113)) 3 RIGHT '())
+                              (make-snake (list (make-posn 363 113) (make-posn 388 113) (make-posn 413 113)) 3 RIGHT)
                               (compute-apple-position 1 1 (compute-available-pos (cons (make-posn 488 488) (snake-position SNAKE1)) BACKGROUNDPOS))
                               GAME-T
                               QUIT-F))
               (place-image APPLEUNIT 463 488 (place-image TAIL 363 113 (place-image SNAKEUNIT 388 113 (place-image SNAKEHEAD 413 113 BACKGROUND)))))
 
 (check-expect (draw-appstate (make-appstate
-                              (make-snake (list (make-posn 113 113) (make-posn 163 113) (make-posn 138 113) (make-posn 188 113)) 4 RIGHT '())
+                              (make-snake (list (make-posn 113 113) (make-posn 163 113) (make-posn 138 113) (make-posn 188 113)) 4 RIGHT)
                               (compute-apple-position 100 1 (compute-available-pos (cons (make-posn 488 363) (snake-position SNAKE1)) BACKGROUNDPOS))
                               GAME-T
                               QUIT-F))
               (place-image APPLEUNIT 13 388 (place-image TAIL 113 113 (place-image SNAKEUNIT 163 113 (place-image SNAKEUNIT 138 113 (place-image SNAKEHEAD 188 113 BACKGROUND))))))
               
 (check-expect (draw-appstate (make-appstate
-                              (make-snake (list (make-posn 263 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 363 88)) 5 RIGHT '())
+                              (make-snake (list (make-posn 263 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 363 88)) 5 RIGHT)
                               (compute-apple-position 250 1 (compute-available-pos (cons (make-posn 238 188) (snake-position SNAKE1)) BACKGROUNDPOS))
                               GAME-T
                               QUIT-F))
               (place-image APPLEUNIT 263 188 (place-image TAIL 263 88 (place-image SNAKEUNIT 338 88 (place-image SNAKEUNIT 313 88 (place-image SNAKEUNIT 288 88 (place-image SNAKEHEAD 363 88 BACKGROUND)))))))
 
 (check-expect (draw-appstate (make-appstate
-                              (make-snake (list (make-posn 413 63) (make-posn 438 63) (make-posn 463 63)) 3 RIGHT '())
+                              (make-snake (list (make-posn 413 63) (make-posn 438 63) (make-posn 463 63)) 3 RIGHT)
                               (compute-apple-position 364 1 (compute-available-pos (cons (make-posn 388 38) (snake-position SNAKE1)) BACKGROUNDPOS))
                               GAME-T
                               QUIT-F))
@@ -285,20 +272,20 @@
 (check-expect (change-snake-direction UP SNAKE1) (make-snake (snake-position SNAKE1)
                                                                (snake-length SNAKE1)
                                                                UP
-                                                               (cut-breakpoints (snake-length SNAKE1) (first (snake-position SNAKE1)) (cons (last (snake-position SNAKE1)) (snake-breakpoint SNAKE1)))))
+                                                               ))
 (check-expect (change-snake-direction RIGHT SNAKE1) (make-snake (snake-position SNAKE1)
                                                                (snake-length SNAKE1)
                                                                RIGHT
-                                                               (cut-breakpoints (snake-length SNAKE1) (first (snake-position SNAKE1)) (cons (last (snake-position SNAKE1)) (snake-breakpoint SNAKE1)))))
+                                                               ))
 (check-expect (change-snake-direction DOWN SNAKE1) (make-snake (snake-position SNAKE1)
                                                                (snake-length SNAKE1)
                                                                DOWN
-                                                               (cut-breakpoints (snake-length SNAKE1) (first (snake-position SNAKE1)) (cons (last (snake-position SNAKE1)) (snake-breakpoint SNAKE1)))))
+                                                               ))
 (check-expect (change-snake-direction LEFT (make-snake (list (make-posn 13 13) (make-posn 13 63) (make-posn 13 88)) 3 DOWN '()))
               (make-snake (list (make-posn 13 13) (make-posn 13 63) (make-posn 13 88))
                           3
                           LEFT
-                          (cut-breakpoints 3 (first (list (make-posn 13 13) (make-posn 13 63) (make-posn 13 88))) (cons (last (list (make-posn 13 13) (make-posn 13 63) (make-posn 13 88))) '()))))
+                          ))
 (check-expect (change-snake-direction " " SNAKE1) SNAKE1)
 
 ; Code 
@@ -312,7 +299,7 @@
       (snake-position snake)                                                                                                                              ; the snake's position is the same
       (snake-length snake)                                                                                                                               ; the snake's length is the same
        direction                                                                                                                                         ; the snake's direction changes to up
-      (cut-breakpoints (snake-length snake) (first (snake-position snake)) (cons (last (snake-position snake)) (snake-breakpoint snake))))]; the snake's breakpoint is a list with the position of the head and the point at which the change of direction was made                                                                                           ; the snake's breakpoint is a list with the position of the head and the point at which the change of direction was made
+      )]
     [else snake]))                                                                                                                                       ; for any other case returns the same appstate as before
 
 
@@ -324,28 +311,28 @@
 (check-expect (move-snake (make-snake (snake-position (appstate-snake DEFAULT))
                                       (snake-length (appstate-snake DEFAULT))
                                       (snake-direction (appstate-snake DEFAULT))
-                                      (snake-breakpoint (appstate-snake DEFAULT))))
-                          (make-snake (list (make-posn 38 13) (make-posn 63 13) (make-posn 88 13)) 3 RIGHT '()))
+                                      ))
+                          (make-snake (list (make-posn 38 13) (make-posn 63 13) (make-posn 88 13)) 3 RIGHT))
 
-(check-expect (move-snake (make-snake (list (make-posn 13 38) (make-posn 13 63) (make-posn 13 88)) 3 DOWN '())) 
-              (make-snake (list (make-posn 13 63) (make-posn 13 88) (make-posn 13 113)) 3 DOWN '()))              
+(check-expect (move-snake (make-snake (list (make-posn 13 38) (make-posn 13 63) (make-posn 13 88)) 3 DOWN)) 
+              (make-snake (list (make-posn 13 63) (make-posn 13 88) (make-posn 13 113)) 3 DOWN))              
 
-(check-expect (move-snake (make-snake (list (make-posn 13 38) (make-posn 38 38) (make-posn 63  38)) 3 RIGHT '()))
-              (make-snake (list (make-posn 38 38) (make-posn 63 38) (make-posn 88 38)) 3 RIGHT '()))
+(check-expect (move-snake (make-snake (list (make-posn 13 38) (make-posn 38 38) (make-posn 63  38)) 3 RIGHT))
+              (make-snake (list (make-posn 38 38) (make-posn 63 38) (make-posn 88 38)) 3 RIGHT))
 
-(check-expect (move-snake (make-snake (list (make-posn 13 88) (make-posn 13 63) (make-posn 13  38)) 3 UP '()))
-              (make-snake (list (make-posn 13 63) (make-posn 13 38) (make-posn 13 13)) 3 UP '()))
+(check-expect (move-snake (make-snake (list (make-posn 13 88) (make-posn 13 63) (make-posn 13  38)) 3 UP))
+              (make-snake (list (make-posn 13 63) (make-posn 13 38) (make-posn 13 13)) 3 UP))
 
-(check-expect (move-snake (make-snake (list (make-posn 38 38) (make-posn 63 38) (make-posn 88 38)) 3 LEFT '()))
-              (make-snake (list (make-posn 63 38) (make-posn 38 38) (make-posn 63 38)) 3 LEFT '()))
+(check-expect (move-snake (make-snake (list (make-posn 38 38) (make-posn 63 38) (make-posn 88 38)) 3 LEFT))
+              (make-snake (list (make-posn 63 38) (make-posn 38 38) (make-posn 63 38)) 3 LEFT))
 
 ; Code
 (define (move-snake snake)
   (make-snake
-   (update-positions (snake-direction snake) (snake-position snake) (snake-breakpoint snake))
+   (update-positions (snake-direction snake) (snake-position snake))
    (snake-length snake)
    (snake-direction snake)
-   (cut-breakpoints (snake-length snake) (first (snake-position snake)) (snake-breakpoint snake))))
+   ))
 
 
 ;;;;;;;;;; MOVE ;;;;;;;;;;
@@ -355,51 +342,51 @@
 
 ; Examples
 (check-expect (move DEFAULT) (make-appstate
-                              (make-snake (list (make-posn 38 13) (make-posn 63 13) (make-posn 88 13)) 3 RIGHT '())
+                              (make-snake (list (make-posn 38 13) (make-posn 63 13) (make-posn 88 13)) 3 RIGHT)
                               APPLE1
                               GAME-T
                               QUIT-F))
 
 (check-expect (move (make-appstate
-                     (make-snake (list (make-posn 13 38) (make-posn 13 63) (make-posn 13  88)) 3 DOWN '())
+                     (make-snake (list (make-posn 13 38) (make-posn 13 63) (make-posn 13  88)) 3 DOWN)
                      APPLE1
                      GAME-T
                      QUIT-F))
               (make-appstate
-               (make-snake (list (make-posn 13 63) (make-posn 13 88) (make-posn 13 113)) 3 DOWN '())
+               (make-snake (list (make-posn 13 63) (make-posn 13 88) (make-posn 13 113)) 3 DOWN)
                APPLE1
                GAME-T
                QUIT-F))
 
 (check-expect (move (make-appstate
-                     (make-snake (list (make-posn 13 38) (make-posn 38 38) (make-posn 63  38)) 3 RIGHT '())
+                     (make-snake (list (make-posn 13 38) (make-posn 38 38) (make-posn 63  38)) 3 RIGHT)
                      APPLE1
                      GAME-T
                      QUIT-F))
               (make-appstate
-               (make-snake (list (make-posn 38 38) (make-posn 63 38) (make-posn 88 38)) 3 RIGHT '())
+               (make-snake (list (make-posn 38 38) (make-posn 63 38) (make-posn 88 38)) 3 RIGHT)
                APPLE1
                GAME-T
                QUIT-F))
 
 (check-expect (move (make-appstate
-                     (make-snake (list (make-posn 13 88) (make-posn 13 63) (make-posn 13  38)) 3 UP '())
+                     (make-snake (list (make-posn 13 88) (make-posn 13 63) (make-posn 13  38)) 3 UP)
                      APPLE1
                      GAME-T
                      QUIT-F))
               (make-appstate
-               (make-snake (list (make-posn 13 63) (make-posn 13 38) (make-posn 13 13)) 3 UP '())
+               (make-snake (list (make-posn 13 63) (make-posn 13 38) (make-posn 13 13)) 3 UP)
                APPLE1
                GAME-T
                QUIT-F))
 
 (check-expect (move (make-appstate
-                     (make-snake (list (make-posn 88 38) (make-posn 63 38) (make-posn 38 38)) 3 LEFT '())
+                     (make-snake (list (make-posn 88 38) (make-posn 63 38) (make-posn 38 38)) 3 LEFT)
                      APPLE1
                      GAME-T
                      QUIT-F))
               (make-appstate
-               (make-snake (list (make-posn 63 38) (make-posn 38 38) (make-posn 13 38)) 3 LEFT '())
+               (make-snake (list (make-posn 63 38) (make-posn 38 38) (make-posn 13 38)) 3 LEFT)
                APPLE1
                GAME-T
                QUIT-F))
@@ -419,25 +406,25 @@
 
 ; Examples
 (check-expect (time-tick (make-appstate
-                              (make-snake (list (make-posn 413 113) (make-posn 388 113) (make-posn 363 113)) 3 UP '())
+                              (make-snake (list (make-posn 413 113) (make-posn 388 113) (make-posn 363 113)) 3 UP)
                               APPLE1
                               GAME-T
                               QUIT-F)) 0.9)
 
 (check-expect (time-tick (make-appstate
-                              (make-snake (list (make-posn 188 113) (make-posn 163 113) (make-posn 138 113) (make-posn 113 113)) 4 UP '())
+                              (make-snake (list (make-posn 188 113) (make-posn 163 113) (make-posn 138 113) (make-posn 113 113)) 4 UP)
                               APPLE1
                               GAME-T
                               QUIT-F)) 0.675)
               
 (check-expect (time-tick (make-appstate
-                              (make-snake (list (make-posn 363 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 263 88)) 5 UP '())
+                              (make-snake (list (make-posn 363 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 263 88)) 5 UP)
                               APPLE1
                               GAME-T
                               QUIT-F)) 0.54)
 
 (check-expect (time-tick (make-appstate
-                              (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 UP '())
+                              (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 UP)
                               APPLE1
                               GAME-T
                               QUIT-F)) 0.9)
@@ -461,35 +448,35 @@
 (check-expect (reset DEFAULT) DEFAULT)
 
 (check-expect (reset (make-appstate
-                              (make-snake (list (make-posn 188 113) (make-posn 163 113) (make-posn 138 113) (make-posn 113 113)) 4 RIGHT '())
+                              (make-snake (list (make-posn 188 113) (make-posn 163 113) (make-posn 138 113) (make-posn 113 113)) 4 RIGHT)
                               APPLE1
                               GAME-F
                               QUIT-F))
               (make-appstate
-               (make-snake (list (make-posn 188 113) (make-posn 163 113) (make-posn 138 113) (make-posn 113 113)) 4 RIGHT '())
+               (make-snake (list (make-posn 188 113) (make-posn 163 113) (make-posn 138 113) (make-posn 113 113)) 4 RIGHT)
                APPLE1
                GAME-F
                QUIT-F))
 
 (check-expect (reset (make-appstate
-                              (make-snake (list (make-posn 413 113) (make-posn 388 113) (make-posn 363 113)) 3 RIGHT '())
+                              (make-snake (list (make-posn 413 113) (make-posn 388 113) (make-posn 363 113)) 3 RIGHT)
                               APPLE1
                               GAME-T
                               QUIT-F)) DEFAULT)
 
 (check-expect (reset (make-appstate
-                              (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 RIGHT '())
+                              (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 RIGHT)
                               APPLE1
                               GAME-F
                               QUIT-F))
               (make-appstate
-               (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 RIGHT '())
+               (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 RIGHT)
                APPLE1
                GAME-F
                QUIT-F))
 
 (check-expect (reset (make-appstate
-                              (make-snake (list (make-posn 363 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 263 88)) 5 RIGHT '())
+                              (make-snake (list (make-posn 363 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 263 88)) 5 RIGHT)
                               APPLE1
                               GAME-T
                               QUIT-F)) DEFAULT)
@@ -510,45 +497,45 @@
 (check-expect (quit DEFAULT) (make-appstate SNAKE1 APPLE1 GAME-T QUIT-T))
 
 (check-expect (quit (make-appstate
-                              (make-snake (list (make-posn 188 113) (make-posn 163 113) (make-posn 138 113) (make-posn 113 113)) 4 RIGHT '())
+                              (make-snake (list (make-posn 188 113) (make-posn 163 113) (make-posn 138 113) (make-posn 113 113)) 4 RIGHT)
                               APPLE1
                               GAME-T
                               QUIT-F))
               (make-appstate
-               (make-snake (list (make-posn 188 113) (make-posn 163 113) (make-posn 138 113) (make-posn 113 113)) 4 RIGHT '())
+               (make-snake (list (make-posn 188 113) (make-posn 163 113) (make-posn 138 113) (make-posn 113 113)) 4 RIGHT)
                APPLE1
                GAME-T
                QUIT-T))
 
 (check-expect (quit (make-appstate
-                              (make-snake (list (make-posn 413 113) (make-posn 388 113) (make-posn 363 113)) 3 RIGHT '())
+                              (make-snake (list (make-posn 413 113) (make-posn 388 113) (make-posn 363 113)) 3 RIGHT)
                               APPLE1
                               GAME-T
                               QUIT-F))
               (make-appstate
-               (make-snake (list (make-posn 413 113) (make-posn 388 113) (make-posn 363 113)) 3 RIGHT '())
+               (make-snake (list (make-posn 413 113) (make-posn 388 113) (make-posn 363 113)) 3 RIGHT)
                APPLE1
                GAME-T
                QUIT-T))
 
 (check-expect (quit (make-appstate
-                              (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 RIGHT '())
+                              (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 RIGHT)
                               APPLE1
                               GAME-T
                               QUIT-F))
               (make-appstate
-               (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 RIGHT '())
+               (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 RIGHT)
                APPLE1
                GAME-T
                QUIT-T))
 
 (check-expect (quit (make-appstate
-                              (make-snake (list (make-posn 363 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 263 88)) 5 RIGHT '())
+                              (make-snake (list (make-posn 363 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 263 88)) 5 RIGHT)
                               APPLE1
                               GAME-T
                               QUIT-F))
               (make-appstate
-               (make-snake (list (make-posn 363 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 263 88)) 5 RIGHT '())
+               (make-snake (list (make-posn 363 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 263 88)) 5 RIGHT)
                APPLE1
                GAME-T
                QUIT-T))
@@ -576,32 +563,32 @@
               (make-appstate SNAKE1 APPLE1 GAME-T QUIT-F))
 ; opposite
 (check-expect (handle-keyboard (make-appstate
-                                (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 DOWN '())
+                                (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 DOWN)
                                 APPLE1
                                 GAME-T
                                 QUIT-F) "up")
               (make-appstate
-               (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 DOWN '())
+               (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 DOWN)
                APPLE1
                GAME-T
                QUIT-F))
 (check-expect (handle-keyboard (make-appstate
-                                (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 LEFT '())
+                                (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 LEFT)
                                 APPLE1
                                 GAME-T
                                 QUIT-F) "right")
               (make-appstate
-               (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 LEFT '())
+               (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 LEFT)
                APPLE1
                GAME-T
                QUIT-F))
 (check-expect (handle-keyboard (make-appstate
-                                (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 UP '())
+                                (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 UP)
                                 APPLE1
                                 GAME-T
                                 QUIT-F) "down")
               (make-appstate
-               (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 UP '())
+               (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 UP)
                APPLE1
                GAME-T
                QUIT-F))
@@ -610,32 +597,32 @@
 ; change direction
 (check-expect (handle-keyboard (make-appstate SNAKE1 APPLE1 GAME-T QUIT-F) "up")
               (make-appstate
-               (make-snake (snake-position SNAKE1) (snake-length SNAKE1) UP (cons (make-posn 63 13) '()))
+               (make-snake (snake-position SNAKE1) (snake-length SNAKE1) UP)
                APPLE1
                GAME-T
                QUIT-F))
 
 (check-expect (handle-keyboard (make-appstate SNAKE1 APPLE1 GAME-T QUIT-F) "right")
               (make-appstate
-               (make-snake (snake-position SNAKE1) (snake-length SNAKE1) RIGHT (cons (make-posn 63 13) '()))
+               (make-snake (snake-position SNAKE1) (snake-length SNAKE1) RIGHT)
                APPLE1
                GAME-T
                QUIT-F))
 
 (check-expect (handle-keyboard (make-appstate SNAKE1 APPLE1 GAME-T QUIT-F) "down")
               (make-appstate
-               (make-snake (snake-position SNAKE1) (snake-length SNAKE1) DOWN (cons (make-posn 63 13) '()))
+               (make-snake (snake-position SNAKE1) (snake-length SNAKE1) DOWN)
                APPLE1
                GAME-T
                QUIT-F))
 
 (check-expect (handle-keyboard (make-appstate
-                                (make-snake (list (make-posn 13 13) (make-posn 13 63) (make-posn 13 88)) 3 DOWN '())
+                                (make-snake (list (make-posn 13 13) (make-posn 13 63) (make-posn 13 88)) 3 DOWN)
                                 APPLE1
                                 GAME-T
                                 QUIT-F) "left")
               (make-appstate
-                (make-snake (list (make-posn 13 13) (make-posn 13 63) (make-posn 13 88))(snake-length SNAKE1) LEFT (cons (make-posn 13 88) '()))
+                (make-snake (list (make-posn 13 13) (make-posn 13 63) (make-posn 13 88))(snake-length SNAKE1) LEFT)
                 APPLE1
                 GAME-T
                 QUIT-F))
@@ -644,7 +631,7 @@
 (check-expect (handle-keyboard (make-appstate SNAKE1 APPLE1 GAME-F QUIT-F) "r")
               (make-appstate SNAKE1 APPLE1 GAME-F QUIT-F))
 (check-expect (handle-keyboard (make-appstate
-                              (make-snake (list (make-posn 363 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 263 88)) 5 UP '())
+                              (make-snake (list (make-posn 363 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 263 88)) 5 UP)
                               APPLE1
                               GAME-T
                               QUIT-F) "r")
@@ -653,13 +640,13 @@
 (check-expect (handle-keyboard (make-appstate SNAKE1 APPLE1 GAME-T QUIT-F) "escape")
               (make-appstate SNAKE1 APPLE1 GAME-T QUIT-T))
 (check-expect (handle-keyboard (make-appstate
-                                (make-snake (list (make-posn 363 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 263 88)) 5 UP '())
+                                (make-snake (list (make-posn 363 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 263 88)) 5 UP)
                                 APPLE1
                                 GAME-T
                                 QUIT-F)
                                "escape")
               (make-appstate
-               (make-snake (list (make-posn 363 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 263 88)) 5 UP '())
+               (make-snake (list (make-posn 363 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 263 88)) 5 UP)
                APPLE1
                GAME-T
                QUIT-T))
@@ -707,22 +694,22 @@
 ; Examples
 (check-expect (check-eat-snake DEFAULT) #false)
 (check-expect (check-eat-snake (make-appstate
-                                (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 438 38) (make-posn 463 38) (make-posn 463 63)) 5 DOWN '())
+                                (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 438 38) (make-posn 463 38) (make-posn 463 63)) 5 DOWN)
                                 APPLE1
                                 GAME-T
                                 QUIT-F)) #true)
 (check-expect (check-eat-snake (make-appstate
-                                (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 438 38) (make-posn 463 38) (make-posn 463 13)) 5 UP '())
+                                (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 438 38) (make-posn 463 38) (make-posn 463 13)) 5 UP)
                                 APPLE1
                                 GAME-T
                                 QUIT-F)) #false)
 (check-expect (check-eat-snake (make-appstate
-                                (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63) (make-posn 413 88) (make-posn 438 88) (make-posn 438 63)) 6 UP '())
+                                (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63) (make-posn 413 88) (make-posn 438 88) (make-posn 438 63)) 6 UP)
                                 APPLE1
                                 GAME-T
                                 QUIT-F)) #true)
 (check-expect (check-eat-snake (make-appstate
-                                (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63) (make-posn 388 63) (make-posn 363 63)) 5 LEFT '())
+                                (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63) (make-posn 388 63) (make-posn 363 63)) 5 LEFT)
                                 APPLE1
                                 GAME-T
                                 QUIT-F)) #false)
@@ -736,8 +723,7 @@
            (make-appstate
             (make-snake (rest (snake-position (appstate-snake state)))
                         (snake-length (appstate-snake state))
-                        (snake-direction (appstate-snake state))
-                        (snake-breakpoint (appstate-snake state)))
+                        (snake-direction (appstate-snake state)))
             (appstate-apple state)
             (appstate-game state)
             (appstate-quit state)))]))
@@ -753,52 +739,52 @@
 (check-expect (end? (make-appstate SNAKE1 APPLE1 GAME-T QUIT-T)) #true)
 ;the left limit
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 LEFT '())
+                     (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 LEFT)
                      APPLE1
                      GAME-T
                      QUIT-F))
               #false)
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 38 13) (make-posn 13 13) (make-posn -12 13)) 3 LEFT '())
+                     (make-snake (list (make-posn 38 13) (make-posn 13 13) (make-posn -12 13)) 3 LEFT)
                      APPLE1
                      GAME-T
                      QUIT-F))
               #true)
 ; the right limit
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 488 13) (make-posn 463 13) (make-posn 438 13)) 3 RIGHT '())
+                     (make-snake (list (make-posn 488 13) (make-posn 463 13) (make-posn 438 13)) 3 RIGHT)
                      APPLE1
                      GAME-T
                      QUIT-F))
               #false)
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 438 13) (make-posn 488 13) (make-posn 513 13)) 3 RIGHT '())
+                     (make-snake (list (make-posn 438 13) (make-posn 488 13) (make-posn 513 13)) 3 RIGHT)
                      APPLE1
                      GAME-T
                      QUIT-F))
               #true)
 ; the top limit
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 13 13) (make-posn 13 38) (make-posn 13 63)) 3 UP '())
+                     (make-snake (list (make-posn 13 13) (make-posn 13 38) (make-posn 13 63)) 3 UP)
                      APPLE1
                      GAME-T
                      QUIT-F))
               #false)
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 13 38) (make-posn 13 13) (make-posn 13 -12)) 3 UP '())
+                     (make-snake (list (make-posn 13 38) (make-posn 13 13) (make-posn 13 -12)) 3 UP)
                      APPLE1
                      GAME-T
                      QUIT-F))
               #true)
 ; the bottom limit
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 13 488) (make-posn 13 463) (make-posn 13 438)) 3 DOWN '())
+                     (make-snake (list (make-posn 13 488) (make-posn 13 463) (make-posn 13 438)) 3 DOWN)
                      APPLE1
                      GAME-T
                      QUIT-F))
               #false)
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 13 463) (make-posn 13 488) (make-posn 13 513)) 3 DOWN '())
+                     (make-snake (list (make-posn 13 463) (make-posn 13 488) (make-posn 13 513)) 3 DOWN)
                      APPLE1
                      GAME-T
                      QUIT-F))
@@ -806,22 +792,22 @@
 ; snake hit itself
 (check-expect (end? DEFAULT) #false)
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 438 38) (make-posn 463 38) (make-posn 463 63)) 5 DOWN '())
+                     (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 438 38) (make-posn 463 38) (make-posn 463 63)) 5 DOWN)
                      APPLE1
                      GAME-T
                      QUIT-F)) #true)
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 438 38) (make-posn 463 38) (make-posn 463 13)) 5 UP '())
+                     (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 438 38) (make-posn 463 38) (make-posn 463 13)) 5 UP)
                      APPLE1
                      GAME-T
                      QUIT-F)) #false)
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63) (make-posn 413 88) (make-posn 438 88) (make-posn 438 63)) 6 UP '())
+                     (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63) (make-posn 413 88) (make-posn 438 88) (make-posn 438 63)) 6 UP)
                      APPLE1
                      GAME-T
                      QUIT-F)) #true)
 (check-expect (end? (make-appstate
-                     (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63) (make-posn 388 63) (make-posn 363 63)) 5 LEFT '())
+                     (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63) (make-posn 388 63) (make-posn 363 63)) 5 LEFT)
                      APPLE1
                      GAME-T
                      QUIT-F)) #false)

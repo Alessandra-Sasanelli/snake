@@ -10,7 +10,6 @@
          check-position-out
          compute-available-pos
          update-positions
-         cut-breakpoints
          direction-by-posn
          compute-apple-position)
 
@@ -22,8 +21,8 @@
 (define LEFT "left")
 
 ; Snake struct and one examples
-(define-struct snake [position length direction breakpoint])
-(define SNAKE1 (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 RIGHT '()))
+(define-struct snake [position length direction])
+(define SNAKE1 (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 RIGHT))
 
 
 ;;;;;;;;;; MAKE POSITIONS ;;;;;;;;;;
@@ -233,118 +232,9 @@
     [(< (posn-x posa) (posn-x posb)) LEFT]))
 
 
-
-;;;;;;;;;; POSN AFTER? ;;;;;;;;;;
-; posn-after?: Direction Direction Posn Breakpoint -> Boolean
-; checks whether the posn is after the breakpoint or not
-; Header (define (posn-after? last d pos br) #false)
-
-; Examples
-; same direction
-; up
-(check-expect (posn-after? UP UP (make-posn 13 13) (make-posn 13 13)) #false)
-(check-expect (posn-after? UP UP (make-posn 13 13) (make-posn 13 38)) #true)
-; right
-(check-expect (posn-after? RIGHT RIGHT (make-posn 13 13) (make-posn 13 13)) #false)
-(check-expect (posn-after? RIGHT RIGHT (make-posn 38 13) (make-posn 13 13)) #true)
-; down
-(check-expect (posn-after? DOWN DOWN (make-posn 13 13) (make-posn 13 13)) #false)
-(check-expect (posn-after? DOWN DOWN (make-posn 13 38) (make-posn 13 13)) #true)
-; left
-(check-expect (posn-after? LEFT LEFT (make-posn 13 13) (make-posn 13 13)) #false)
-(check-expect (posn-after? LEFT LEFT (make-posn 13 13) (make-posn 38 13)) #true)
-; different direction
-; up
-(check-expect (posn-after? UP RIGHT (make-posn 13 13) (make-posn 13 13)) #false)
-(check-expect (posn-after? UP RIGHT (make-posn 13 13) (make-posn 13 38)) #true)
-(check-expect (posn-after? UP LEFT (make-posn 13 13) (make-posn 13 38)) #true)
-; right
-(check-expect (posn-after? RIGHT DOWN (make-posn 13 13) (make-posn 13 13)) #false)
-(check-expect (posn-after? RIGHT DOWN (make-posn 38 13) (make-posn 13 13)) #true)
-(check-expect (posn-after? RIGHT UP (make-posn 38 13) (make-posn 13 13)) #true)
-; down
-(check-expect (posn-after? DOWN LEFT (make-posn 13 13) (make-posn 13 13)) #false)
-(check-expect (posn-after? DOWN LEFT (make-posn 13 38) (make-posn 13 13)) #true)
-(check-expect (posn-after? DOWN RIGHT (make-posn 13 38) (make-posn 13 13)) #true)
-; left
-(check-expect (posn-after? LEFT UP (make-posn 13 13) (make-posn 13 13)) #false)
-(check-expect (posn-after? LEFT UP (make-posn 13 13) (make-posn 38 13)) #true)
-(check-expect (posn-after? LEFT DOWN (make-posn 13 13) (make-posn 38 13)) #true)
-; any other
-(check-expect (posn-after? "I'm" "a string" (make-posn 13 13) (make-posn 38 13)) #false)
-
-; Code
-(define (posn-after? last d pos br)
-  (cond
-    [(equal? d UP)                                                ;
-     (or (< (posn-y pos) (posn-y br))                             ;
-         (and (equal? last LEFT) (< (posn-x pos) (posn-x br)))    ;
-         (and (equal? last RIGHT) (> (posn-x pos) (posn-x br))))] ;
-    [(equal? d DOWN)                                              ;
-     (or (> (posn-y pos) (posn-y br))                             ;
-         (and (equal? last LEFT) (< (posn-x pos) (posn-x br)))    ;
-         (and (equal? last RIGHT) (> (posn-x pos) (posn-x br))))] ;
-    [(equal? d LEFT)                                              ;
-     (or (< (posn-x pos) (posn-x br))                             ;
-         (and (equal? last UP) (< (posn-y pos) (posn-y br)))      ;
-         (and (equal? last DOWN) (> (posn-y pos) (posn-y br))))]  ;
-    [(equal? d RIGHT)                                             ;
-     (or (> (posn-x pos) (posn-x br))                             ;
-         (and (equal? last UP) (< (posn-y pos) (posn-y br)))      ;
-         (and (equal? last DOWN) (> (posn-y pos) (posn-y br))))]  ;
-    [else #true]))                                                ;
-
-
-;;;;;;;;;; COMPUTE POSN DIRECTION ON BREAKPOINTS ;;;;;;;;;;
-; posn-dir-breakpoints: Direction Direction Posn List<Breakpoints> -> Posn
-; compute the positions based on the breakpoints
-; Header (posn-dir-breakpoints last d pos lob) posn)
-
-; Examples
-; same directions
-(check-expect (posn-dir-breakpoints UP UP (make-posn 13 88) (list (make-posn 13 88) (make-posn 13 63) (make-posn 13 38))) (make-posn 13 63))
-(check-expect (posn-dir-breakpoints RIGHT RIGHT (make-posn 113 13) (list (make-posn 88 13) (make-posn 113 13) (make-posn 138 13))) (make-posn 138 13))
-(check-expect (posn-dir-breakpoints DOWN DOWN (make-posn 13 63) (list (make-posn 13 38) (make-posn 13 63) (make-posn 13 88))) (make-posn 13 88))
-(check-expect (posn-dir-breakpoints LEFT LEFT (make-posn 138 13) (list (make-posn 168 13) (make-posn 138 13) (make-posn 113 13))) (make-posn 113 13))
-; different directions
-(check-expect (posn-dir-breakpoints UP RIGHT (make-posn 13 88) (list (make-posn 13 88) (make-posn 13 63) (make-posn 13 38))) (make-posn 38 88))
-(check-expect (posn-dir-breakpoints UP RIGHT (make-posn 13 88) (list (make-posn 13 88))) (make-posn 38 88))
-(check-expect (posn-dir-breakpoints RIGHT DOWN (make-posn 113 13) (list (make-posn 88 13) (make-posn 113 13) (make-posn 138 13))) (make-posn 113 38))
-(check-expect (posn-dir-breakpoints DOWN LEFT (make-posn 63 63) (list (make-posn 63 38) (make-posn 63 63) (make-posn 63 88))) (make-posn 38 63))
-(check-expect (posn-dir-breakpoints LEFT UP (make-posn 138 88) (list (make-posn 168 88) (make-posn 138 88) (make-posn 113 88))) (make-posn 138 63))
-; empty
-(check-expect (posn-dir-breakpoints UP RIGHT (make-posn 13 13) '()) (make-posn 38 13))
-(check-expect (posn-dir-breakpoints DOWN LEFT (make-posn 38 13) (list (make-posn 13 13))) (make-posn 13 13))
-
-; Code
-(define (posn-dir-breakpoints last d pos lob) ;last=last direction d=current direction pos=posn lob=list of breakpoint
-  (cond
-    [(empty? lob) (compute-new-posn pos d)]                                                      ;
-    [(equal? pos (first lob)) (compute-new-posn pos d)]                                          ;
-    [(and (equal? (posn-x pos) (posn-x (first lob)))
-          (not (posn-after? last d pos (first lob)))
-          (not (string=? last d)))                                                                 ;
-     (cond
-       [(< (posn-y (first lob)) (posn-y pos))                                                    ;
-        (compute-new-posn pos UP)]                                                               ;
-       [(> (posn-y (first lob)) (posn-y pos))                                                    ;
-        (compute-new-posn pos DOWN)]                                                             ;
-       [else pos])]                                                                              ;
-    [(and (equal? (posn-y pos) (posn-y (first lob)))
-          (not (posn-after? last d pos (first lob)))
-          (not (string=? last d)))                                                                 ;
-     (cond
-       [(< (posn-x (first lob)) (posn-x pos))                                                    ;
-        (compute-new-posn pos LEFT)]                                                             ;
-       [(> (posn-x (first lob)) (posn-x pos))                                                    ;
-        (compute-new-posn pos RIGHT)]                                                            ;
-       [else pos])]                                                                              ;
-    [else (posn-dir-breakpoints last d pos (rest lob))]))                                        ;
-
-
 ;;;;;;;;;; UPDATE-POSITIONS ;;;;;;;;;;
-; update-positions: Direction List<Posn> List<Breakpoint> -> List<Posn>
-; updates a list of positions based on a list of breakpoints
+; update-positions: Direction List<Posn> -> List<Posn>
+; updates a list of positions based on itself and the head direction
 ; Header (define (update-position d lop lob) (list (make-posn 13 63) (make-posn 13 38) (make-posn 13 13)))
 
 ; Examples
@@ -355,34 +245,8 @@
 (check-expect (update-positions UP (list (make-posn 13 88) (make-posn 13 63) (make-posn 13 38)) (list (make-posn 13 88))) (list (make-posn 13 63) (make-posn 13 38) (make-posn 13 13)))
 
 ; Code
-(define (update-positions d lop lob)
+(define (update-positions d lop)
   (cond
-    [(empty? (rest lop)) (cons (compute-new-posn (first lop) d) '())]                                                                                                               ; create a new head's posn
-    [(empty? (rest (rest lop)))                                                                                                                                                     ; 
-     (cons (posn-dir-breakpoints (direction-by-posn (first lop) (second lop)) d (first lop) lob) (update-positions d (rest lop) lob))]                                              ; recursion over lop
+    [(empty? (rest lop)) (cons (compute-new-posn (first lop) d) '())]
     [else
-     (cons (posn-dir-breakpoints (direction-by-posn (first lop) (second lop)) (direction-by-posn (second lop) (third lop)) (first lop) lob) (update-positions d (rest lop) lob))])) ; 
-
-
-;;;;;;;;;; CUT BREAKPOINTS ;;;;;;;;;;
-; cut-breakpoints: Length Any List<Any> -> List<Any>
-; cuts out last elements from a list based on the Length and on any type that matches the type of the list (wich is the tail of the snake)
-; (used to cut out breakpoints from a list of posn in this program)
-; Header (define (cut-breakpoints 3 (list (make-posn 13 13))))
-
-; Examples
-(check-expect (cut-breakpoints 3 2 (list 1 2 3 4 5 6)) (list 1))
-(check-expect (cut-breakpoints 10 1 (list 1 2 3 4 5 6)) (list 1 2 3 4 5 6))
-(check-expect (cut-breakpoints 7 1 (list 1)) '())
-(check-expect (cut-breakpoints 6 5 (list 1 2 3 4 5 6)) (list 1 2 3 4))
-(check-expect (cut-breakpoints 5 1 (list 3 2 1)) (list 3 2))
-
-
-; Code
-(define (cut-breakpoints n pos lob)
-  (cond
-    [(empty? lob) lob]
-    [(< (- n 2) (length lob)) (cut-breakpoints n pos (reverse (rest (reverse lob))))]
-    [(equal? pos (first (reverse lob))) (cut-breakpoints n pos (reverse (rest (reverse lob))))]
-    [(and (empty? (rest lob)) (equal? pos (first lob))) '()]
-    [else lob]))
+     (cons (compute-new-posn (first lop) (direction-by-posn (first lop) (second lop))) (update-positions d (rest lop)))]))
