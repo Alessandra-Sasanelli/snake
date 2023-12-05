@@ -811,7 +811,7 @@
                      APPLE1
                      GAME-T
                      QUIT-F)) #false)
-
+ 
 ; Code
 (define (end? state)
   (cond
