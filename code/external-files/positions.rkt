@@ -1,10 +1,14 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-advanced-reader.ss" "lang")((modname positions) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
+; This file contains all the functions relative to the positions
 (require racket/base)
 
+(require "generals.rkt")
+
 ; export all file's functions
-(provide make-positions
+(provide BACKGROUNDPOS
+         make-positions
          increment-pos
          decrement-pos
          check-position-out
@@ -13,17 +17,15 @@
          direction-by-posn
          compute-apple-position)
 
-;;;;;;;;;; COSTANTS ;;;;;;;;;;
-; Directions
-(define UP "up")
-(define RIGHT "right")
-(define DOWN "down")
-(define LEFT "left")
+;;;;;;;;;; DATA TYPE ;;;;;;;;;
+; a List<Posn> is one of:
+;  - '()
+;  - (cons Posn List<Posn>)
+; represents a list of positions
 
-; Snake struct and one examples
+; Snake struct and one example
 (define-struct snake [position length direction])
 (define SNAKE1 (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 RIGHT))
-
 
 ;;;;;;;;;; MAKE POSITIONS ;;;;;;;;;;
 ; make-positions: Number Number Number List<Posn> -> List<Posn>
@@ -221,7 +223,6 @@
 (check-expect (direction-by-posn (make-posn 13 38) (make-posn 38 38)) RIGHT)
 (check-expect (direction-by-posn (make-posn 13 13) (make-posn 13 38)) DOWN)
 (check-expect (direction-by-posn (make-posn 38 38) (make-posn 13 38)) LEFT)
-;(check-expect (direction-by-posn (make-posn 13 138) (make-posn 13 113)) UP)
 
 ; Code
 (define (direction-by-posn posb posa)
@@ -231,18 +232,17 @@
     [(> (posn-y posa) (posn-y posb)) DOWN]
     [(< (posn-x posa) (posn-x posb)) LEFT]))
 
-
 ;;;;;;;;;; UPDATE-POSITIONS ;;;;;;;;;;
 ; update-positions: Direction List<Posn> -> List<Posn>
 ; updates a list of positions based on itself and the head direction
 ; Header (define (update-position d lop lob) (list (make-posn 13 63) (make-posn 13 38) (make-posn 13 13)))
 
 ; Examples
-(check-expect (update-positions UP (list (make-posn 13 88) (make-posn 13 63) (make-posn 13 38)) '()) (list (make-posn 13 63) (make-posn 13 38) (make-posn 13 13)))
-(check-expect (update-positions RIGHT (list (make-posn 88 13) (make-posn 113 13) (make-posn 138 13)) '()) (list (make-posn 113 13) (make-posn 138 13) (make-posn 163 13)))
-(check-expect (update-positions DOWN (list (make-posn 13 38) (make-posn 13 63) (make-posn 13 88)) '()) (list (make-posn 13 63) (make-posn 13 88) (make-posn 13 113)))
-(check-expect (update-positions LEFT (list (make-posn 168 13) (make-posn 138 13) (make-posn 113 13)) '()) (list (make-posn 143 13) (make-posn 113 13) (make-posn 88 13)))
-(check-expect (update-positions UP (list (make-posn 13 88) (make-posn 13 63) (make-posn 13 38)) (list (make-posn 13 88))) (list (make-posn 13 63) (make-posn 13 38) (make-posn 13 13)))
+(check-expect (update-positions UP (list (make-posn 13 88) (make-posn 13 63) (make-posn 13 38))) (list (make-posn 13 63) (make-posn 13 38) (make-posn 13 13)))
+(check-expect (update-positions RIGHT (list (make-posn 88 13) (make-posn 113 13) (make-posn 138 13))) (list (make-posn 113 13) (make-posn 138 13) (make-posn 163 13)))
+(check-expect (update-positions DOWN (list (make-posn 13 38) (make-posn 13 63) (make-posn 13 88))) (list (make-posn 13 63) (make-posn 13 88) (make-posn 13 113)))
+(check-expect (update-positions LEFT (list (make-posn 168 13) (make-posn 138 13) (make-posn 113 13))) (list (make-posn 143 13) (make-posn 113 13) (make-posn 88 13)))
+(check-expect (update-positions UP (list (make-posn 13 88) (make-posn 13 63) (make-posn 13 38))) (list (make-posn 13 63) (make-posn 13 38) (make-posn 13 13)))
 
 ; Code
 (define (update-positions d lop)
