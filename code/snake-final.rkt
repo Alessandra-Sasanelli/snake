@@ -14,7 +14,6 @@
 (require "external-files/positions.rkt")
 (require "external-files/generals.rkt")
 
-
 ;;;;;;;;;;;;;;;;;;;; DATA TYPES ;;;;;;;;;;;;;;;;;;;;
 ; an AppleUnit is an Image
 ; It represents the little rectangles that the apple is made off
@@ -39,7 +38,9 @@
 ; the first example of an Apple
 (define APPLE1 (compute-apple-position (random 401) 1 (compute-available-pos (cons (make-posn 0 0)(snake-position SNAKE1)) BACKGROUNDPOS)))
 
-(define GAMEBACK (bitmap "../resources/game-background.png"))
+; Variables to be modified on-tick
+(define TICK 0)
+(define RATE 10)
 ;;;;;;;;;;;;;;;;;;;; FUNCTIONS ;;;;;;;;;;;;;;;;;;;;
 
 
@@ -106,7 +107,11 @@
     (make-appstate
      (move-snake
       (make-snake (cons (first (snake-position (appstate-snake state))) (snake-position (appstate-snake state)))
-                  (add1 (snake-length (appstate-snake state)))
+                  (begin
+                    (set! RATE
+                          (if (and (> (sub1 RATE) 0) (= 0 (remainder (- 2 (snake-length (appstate-snake state))) 2)))
+                              (sub1 RATE) RATE))
+                    (add1 (snake-length (appstate-snake state))))
                   (snake-direction (appstate-snake state))))
       (compute-apple-position (random 401) 1 (compute-available-pos (cons (appstate-apple state) (snake-position (appstate-snake state))) BACKGROUNDPOS))
       (appstate-game state)
@@ -115,6 +120,7 @@
 
 ;;;;;;;;;; MOVE ;;;;;;;;;;
 ; move: AppState -> AppState
+; write: TICK (adds one everytime it is called)
 ; moves the snake using an auxiliary function
 ; Header (define (move appstate)
 
@@ -171,13 +177,17 @@
 
 ; Code
 (define (move state)
-  (cond
-    [(equal? (last (snake-position (appstate-snake state))) (appstate-apple state)) (eating state)]
-    [else  (make-appstate                          ; every tick the appstate is moved and it creates a new update where it is made by :
-            (move-snake (appstate-snake state))   ; the new position of the snake
-            (appstate-apple state)                ; the apple's state is the same
-            (appstate-game state)                 ; the game's state is the same
-            (appstate-quit state))]))               ; the quit's state is the same
+         (begin (set! TICK (add1 TICK)) (cond
+           [(= (remainder TICK RATE) 0)
+            (cond
+              [(equal? (last (snake-position (appstate-snake state))) (appstate-apple state)) (eating state)]
+              [else  (make-appstate                          ; every tick the appstate is moved and it creates a new update where it is made by :
+                      (move-snake (appstate-snake state))   ; the new position of the snake
+                      (appstate-apple state)                ; the apple's state is the same
+                      (appstate-game state)                 ; the game's state is the same
+                      (appstate-quit state))])]
+           [else
+            state])))               ; the quit's state is the same
 
 
 ;;;;;;;;;; TICK ;;;;;;;;;;
@@ -218,7 +228,7 @@
 
 ; Code
 (define (time-tick state) 0.4); (/ 1 (snake-length (appstate-snake state)))) ; longer the snake is, faster the game will be because the tick will decrease
-
+ 
 
 ;;;;;;;;;; RESET ;;;;;;;;;;1
 ; reset: AppState -> AppState
@@ -327,7 +337,7 @@
                       (appstate-apple state) ; the apple remain the same
                       (appstate-game state)  ; the game remain the same
                       #true))                ; the quit change to quit the application
-
+ 
 
 ;;;;;;;;;; HANDLE KEYBOARD ;;;;;;;;;;
 ; handle-keyboard: AppState KeyboardEvent -> AppState
@@ -526,7 +536,7 @@
                      APPLE1
                      GAME-T
                      QUIT-F))
-              #true)
+              #true) 
 ; snake hit itself
 (check-expect (end? DEFAULT) #false)
 (check-expect (end? (make-appstate
@@ -567,6 +577,7 @@
   (big-bang appstate
     [to-draw draw-appstate]                                  ; draw the snake and apple on the background
     [on-key handle-keyboard]                                 ; change snake's direction or reset game or quit the game
-    [on-tick move (time-tick appstate)]                      ; uptade snake's position and "time" incrase each tick
+    [on-tick move 0.08]                                          ; uptade snake's position and "time" incrase each tick
     ;[display-mode 'fullscreen]                              ; the display automatically becomes full screen
+    [name "Snake Game"]
     [stop-when end?]))                                       ; quit the application

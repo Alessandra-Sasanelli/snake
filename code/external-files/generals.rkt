@@ -6,6 +6,7 @@
 (require 2htdp/image)
 
 (provide BACKGROUND
+         GAMEBACK
          UP
          DOWN
          RIGHT
@@ -34,6 +35,7 @@
 ; - #true    : the game is off and "close"
 
 (define BACKGROUND (bitmap "../../resources/snake-background.png"))
+(define GAMEBACK (bitmap "../../resources/game-background.png"))
 
 ; Directions
 (define UP "up")
