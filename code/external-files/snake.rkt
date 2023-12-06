@@ -29,8 +29,8 @@
 (define LEFT "left")
 
 ; Snake struct and one examples
-(define-struct snake [position length direction])
-(define SNAKE1 (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 RIGHT))
+(define-struct snake [position length direction] #:transparent)
+(define SNAKE1 (make-snake (list (make-posn 188 238) (make-posn 213 238) (make-posn 238 238)) 3 RIGHT))
 
 ; SnakeUnit
 (define SNAKEUNIT (rectangle 24 24 "solid" 'green)) ; (bitmap "../resources/SNAKEUNIT.png")
@@ -106,7 +106,7 @@
 ; Header (define (draw-snake snake) (place-image TAIL 413 113 (place-image SNAKEUNIT 388 113 (place-image SNAKEHEAD 363 113 BACKGROUND))))
 
 ; Examples
-(check-expect (draw-snake SNAKE1) (place-image SNAKEHEAD 63 13 (place-image SNAKEUNIT 38 13 (place-image TAIL 13 13 BACKGROUND))))
+(check-expect (draw-snake SNAKE1) (place-image SNAKEHEAD 238 238 (place-image SNAKEUNIT 213 238 (place-image TAIL 188 238 BACKGROUND))))
 
 (check-expect (draw-snake (make-snake (list (make-posn 363 113) (make-posn 388 113) (make-posn 413 113)) 3 RIGHT))
               (place-image TAIL 363 113 (place-image SNAKEUNIT 388 113 (place-image SNAKEHEAD 413 113 BACKGROUND))))
@@ -188,7 +188,7 @@
 (check-expect (move-snake (make-snake (snake-position SNAKE1)
                                       (snake-length SNAKE1)
                                       (snake-direction SNAKE1)))
-              (make-snake (list (make-posn 38 13) (make-posn 63 13) (make-posn 88 13)) 3 RIGHT))
+              (make-snake (list (make-posn 213 238) (make-posn 238 238) (make-posn 263 238)) 3 RIGHT))
 
 (check-expect (move-snake (make-snake (list (make-posn 13 38) (make-posn 13 63) (make-posn 13 88)) 3 DOWN)) 
               (make-snake (list (make-posn 13 63) (make-posn 13 88) (make-posn 13 113)) 3 DOWN))              

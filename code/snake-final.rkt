@@ -68,21 +68,21 @@
                               (compute-apple-position 250 1 (compute-available-pos (cons (make-posn 238 188) (snake-position SNAKE1)) BACKGROUNDPOS))
                               GAME-T
                               QUIT-F))
-              (place-image APPLEUNIT 263 188 (place-image TAIL 263 88 (place-image SNAKEUNIT 338 88 (place-image SNAKEUNIT 313 88 (place-image SNAKEUNIT 288 88 (place-image SNAKEHEAD 363 88 BACKGROUND)))))))
+              (place-image APPLEUNIT 163 188 (place-image TAIL 263 88 (place-image SNAKEUNIT 338 88 (place-image SNAKEUNIT 313 88 (place-image SNAKEUNIT 288 88 (place-image SNAKEHEAD 363 88 BACKGROUND)))))))
 
 (check-expect (draw-appstate (make-appstate
                               (make-snake (list (make-posn 413 63) (make-posn 438 63) (make-posn 463 63)) 3 RIGHT)
                               (compute-apple-position 364 1 (compute-available-pos (cons (make-posn 388 38) (snake-position SNAKE1)) BACKGROUNDPOS))
                               GAME-T
                               QUIT-F))
-              (place-image APPLEUNIT 413 38 (place-image TAIL 413 63 (place-image SNAKEUNIT 438 63 (place-image SNAKEHEAD 463 63 BACKGROUND)))))
+              (place-image APPLEUNIT 313 38 (place-image TAIL 413 63 (place-image SNAKEUNIT 438 63 (place-image SNAKEHEAD 463 63 BACKGROUND)))))
 
 (check-expect (draw-appstate (make-appstate
                               SNAKE1
                               (compute-apple-position 396 1 (compute-available-pos (cons (make-posn 88 13) (snake-position SNAKE1)) BACKGROUNDPOS))
                               GAME-T
                               QUIT-F))
-              (place-image APPLEUNIT 113 13 (place-image TAIL 13 13 (place-image SNAKEUNIT 38 13 (place-image SNAKEHEAD 63 13 BACKGROUND)))))
+              (place-image APPLEUNIT 13 13 (place-image TAIL 188 238 (place-image SNAKEUNIT 213 238 (place-image SNAKEHEAD 238 238 BACKGROUND)))))
 
 ; Code
 (define (draw-appstate state)                          ; draw a image of the appstate at moment
@@ -92,6 +92,26 @@
                (draw-snake (appstate-snake state))))   ; a Snake call its own function to draw itself
 
 
+;;;;;;;;;; EATING ;;;;;;;;;;
+; eating : AppState -> AppState
+; when the apple is eating by the snake, it will become more longer and the apple's position will uptate
+; Header (define (eating state) state)
+
+; Examples
+; the apple's position is randomic so it is impossible to do some examples because we cannot predict its position
+
+; Code
+(define (eating state)
+    (make-appstate
+     (move-snake
+      (make-snake (cons (first (snake-position (appstate-snake state))) (snake-position (appstate-snake state)))
+                  (add1 (snake-length (appstate-snake state)))
+                  (snake-direction (appstate-snake state))))
+      (compute-apple-position (random 401) 1 (compute-available-pos (cons (appstate-apple state) (snake-position (appstate-snake state))) BACKGROUNDPOS))
+      (appstate-game state)
+      (appstate-quit state)))
+
+
 ;;;;;;;;;; MOVE ;;;;;;;;;;
 ; move: AppState -> AppState
 ; moves the snake using an auxiliary function
@@ -99,7 +119,7 @@
 
 ; Examples
 (check-expect (move DEFAULT) (make-appstate
-                              (make-snake (list (make-posn 38 13) (make-posn 63 13) (make-posn 88 13)) 3 RIGHT)
+                              (make-snake (list (make-posn 213 238) (make-posn 238 238) (make-posn 263 238)) 3 RIGHT)
                               APPLE1
                               GAME-T
                               QUIT-F))
@@ -149,11 +169,14 @@
                QUIT-F))
 
 ; Code
-(define (move appstate) (make-appstate                          ; every tick the appstate is moved and it creates a new update where it is made by :
-                         (move-snake (appstate-snake appstate))   ; the new position of the snake
-                         (appstate-apple appstate)                ; the apple's state is the same
-                         (appstate-game appstate)                 ; the game's state is the same
-                         (appstate-quit appstate)))               ; the quit's state is the same
+(define (move state)
+  (cond
+    [(equal? (last (snake-position (appstate-snake state))) (appstate-apple state)) (eating state)]
+    [else  (make-appstate                          ; every tick the appstate is moved and it creates a new update where it is made by :
+            (move-snake (appstate-snake state))   ; the new position of the snake
+            (appstate-apple state)                ; the apple's state is the same
+            (appstate-game state)                 ; the game's state is the same
+            (appstate-quit state))]))               ; the quit's state is the same
 
 
 ;;;;;;;;;; TICK ;;;;;;;;;;
@@ -193,10 +216,10 @@
                               QUIT-F)) 0.9)
 
 ; Code
-(define (time-tick state) (/ 2.7 (snake-length (appstate-snake state)))) ; longer the snake is, faster the game will be because the tick will decrease
+(define (time-tick state) 0.4); (/ 1 (snake-length (appstate-snake state)))) ; longer the snake is, faster the game will be because the tick will decrease
 
 
-;;;;;;;;;; RESET ;;;;;;;;;; 
+;;;;;;;;;; RESET ;;;;;;;;;;1
 ; reset: AppState -> AppState
 ; changes the game in the appstate
 ; Header (define (reset state) DEFAULT
@@ -543,6 +566,6 @@
   (big-bang appstate
     [to-draw draw-appstate]                                  ; draw the snake and apple on the background
     [on-key handle-keyboard]                                 ; change snake's direction or reset game or quit the game
-    [on-tick move 0.2];(time-tick appstate)]                      ; uptade snake's position and "time" incrase each tick
+    [on-tick move (time-tick appstate)]                      ; uptade snake's position and "time" incrase each tick
     ;[display-mode 'fullscreen]                              ; the display automatically becomes full screen
     [stop-when end?]))                                       ; quit the application
