@@ -172,11 +172,12 @@
 (define (move state)
   (cond
     [(equal? (last (snake-position (appstate-snake state))) (appstate-apple state)) (eating state)]
-    [else  (make-appstate                          ; every tick the appstate is moved and it creates a new update where it is made by :
-            (move-snake (appstate-snake state))   ; the new position of the snake
-            (appstate-apple state)                ; the apple's state is the same
-            (appstate-game state)                 ; the game's state is the same
-            (appstate-quit state))]))               ; the quit's state is the same
+    [else
+     (make-appstate                         ; every tick the appstate is moved and it creates a new update where it is made by :
+      (move-snake (appstate-snake state))   ; the new position of the snake
+      (appstate-apple state)                ; the apple's state is the same
+      (appstate-game state)                 ; the game's state is the same
+      (appstate-quit state))]))               ; the quit's state is the same
 
 
 ;;;;;;;;;; TICK ;;;;;;;;;;
@@ -189,37 +190,37 @@
                               (make-snake (list (make-posn 413 113) (make-posn 388 113) (make-posn 363 113)) 3 UP)
                               APPLE1
                               GAME-T
-                              QUIT-F)) 0.9)
+                              QUIT-F)) 0.4)
 
 (check-expect (time-tick (make-appstate
                               (make-snake (list (make-posn 188 113) (make-posn 163 113) (make-posn 138 113) (make-posn 113 113)) 4 UP)
                               APPLE1
                               GAME-T
-                              QUIT-F)) 0.675)
+                              QUIT-F)) 0.3)
               
 (check-expect (time-tick (make-appstate
                               (make-snake (list (make-posn 363 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 263 88)) 5 UP)
                               APPLE1
                               GAME-T
-                              QUIT-F)) 0.54)
+                              QUIT-F)) 0.24)
 
 (check-expect (time-tick (make-appstate
                               (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 UP)
                               APPLE1
                               GAME-T
-                              QUIT-F)) 0.9)
+                              QUIT-F)) 0.4)
 
 (check-expect (time-tick (make-appstate
                               SNAKE1
                               APPLE1
                               GAME-T
-                              QUIT-F)) 0.9)
+                              QUIT-F)) 0.4)
 
 ; Code
-(define (time-tick state) 0.4); (/ 1 (snake-length (appstate-snake state)))) ; longer the snake is, faster the game will be because the tick will decrease
+(define (time-tick state) (/ 1.2 (snake-length (appstate-snake state)))) ; longer the snake is, faster the game will be because the tick will decrease
 
 
-;;;;;;;;;; RESET ;;;;;;;;;;1
+;;;;;;;;;; RESET ;;;;;;;;;;
 ; reset: AppState -> AppState
 ; changes the game in the appstate
 ; Header (define (reset state) DEFAULT
@@ -566,6 +567,7 @@
   (big-bang appstate
     [to-draw draw-appstate]                                  ; draw the snake and apple on the background
     [on-key handle-keyboard]                                 ; change snake's direction or reset game or quit the game
-    [on-tick move (time-tick appstate)]                      ; uptade snake's position and "time" incrase each tick
+    [on-tick move 0.2]                      ; uptade snake's position and "time" incrase each tick
     ;[display-mode 'fullscreen]                              ; the display automatically becomes full screen
+    [name "Snake Game"]
     [stop-when end?]))                                       ; quit the application
