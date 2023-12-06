@@ -39,7 +39,9 @@
 ; the first example of an Apple
 (define APPLE1 (compute-apple-position (random 401) 1 (compute-available-pos (cons (make-posn 0 0)(snake-position SNAKE1)) BACKGROUNDPOS)))
 
+; General background
 (define GAMEBACK (bitmap "../resources/game-background.png"))
+
 ;;;;;;;;;;;;;;;;;;;; FUNCTIONS ;;;;;;;;;;;;;;;;;;;;
 
 
@@ -54,43 +56,43 @@
                               (compute-apple-position 1 1 (compute-available-pos (cons (make-posn 488 488) (snake-position SNAKE1)) BACKGROUNDPOS))
                               GAME-T
                               QUIT-F))
-              (place-image APPLEUNIT 463 488 (place-image TAIL 363 113 (place-image SNAKEUNIT 388 113 (place-image SNAKEHEAD 413 113 BACKGROUND)))))
+              (overlay/align 'center 'center (place-image APPLEUNIT 463 488 (place-image TAIL 363 113 (place-image SNAKEUNIT 388 113 (place-image SNAKEHEAD 413 113 BACKGROUND)))) GAMEBACK))
 
 (check-expect (draw-appstate (make-appstate
                               (make-snake (list (make-posn 113 113) (make-posn 163 113) (make-posn 138 113) (make-posn 188 113)) 4 RIGHT)
                               (compute-apple-position 100 1 (compute-available-pos (cons (make-posn 488 363) (snake-position SNAKE1)) BACKGROUNDPOS))
                               GAME-T
                               QUIT-F))
-              (place-image APPLEUNIT 13 388 (place-image TAIL 113 113 (place-image SNAKEUNIT 163 113 (place-image SNAKEUNIT 138 113 (place-image SNAKEHEAD 188 113 BACKGROUND))))))
-              
+              (overlay/align 'center 'center (place-image APPLEUNIT 13 388 (place-image TAIL 113 113 (place-image SNAKEUNIT 163 113 (place-image SNAKEUNIT 138 113 (place-image SNAKEHEAD 188 113 BACKGROUND))))) GAMEBACK))
+
 (check-expect (draw-appstate (make-appstate
                               (make-snake (list (make-posn 263 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 363 88)) 5 RIGHT)
                               (compute-apple-position 250 1 (compute-available-pos (cons (make-posn 238 188) (snake-position SNAKE1)) BACKGROUNDPOS))
                               GAME-T
                               QUIT-F))
-              (place-image APPLEUNIT 163 188 (place-image TAIL 263 88 (place-image SNAKEUNIT 338 88 (place-image SNAKEUNIT 313 88 (place-image SNAKEUNIT 288 88 (place-image SNAKEHEAD 363 88 BACKGROUND)))))))
+              (overlay/align 'center 'center (place-image APPLEUNIT 163 188 (place-image TAIL 263 88 (place-image SNAKEUNIT 338 88 (place-image SNAKEUNIT 313 88 (place-image SNAKEUNIT 288 88 (place-image SNAKEHEAD 363 88 BACKGROUND)))))) GAMEBACK))
 
 (check-expect (draw-appstate (make-appstate
                               (make-snake (list (make-posn 413 63) (make-posn 438 63) (make-posn 463 63)) 3 RIGHT)
                               (compute-apple-position 364 1 (compute-available-pos (cons (make-posn 388 38) (snake-position SNAKE1)) BACKGROUNDPOS))
                               GAME-T
                               QUIT-F))
-              (place-image APPLEUNIT 313 38 (place-image TAIL 413 63 (place-image SNAKEUNIT 438 63 (place-image SNAKEHEAD 463 63 BACKGROUND)))))
+              (overlay/align 'center 'center (place-image APPLEUNIT 313 38 (place-image TAIL 413 63 (place-image SNAKEUNIT 438 63 (place-image SNAKEHEAD 463 63 BACKGROUND)))) GAMEBACK))
 
 (check-expect (draw-appstate (make-appstate
                               SNAKE1
                               (compute-apple-position 396 1 (compute-available-pos (cons (make-posn 88 13) (snake-position SNAKE1)) BACKGROUNDPOS))
                               GAME-T
                               QUIT-F))
-              (place-image APPLEUNIT 13 13 (place-image TAIL 188 238 (place-image SNAKEUNIT 213 238 (place-image SNAKEHEAD 238 238 BACKGROUND)))))
+              (overlay/align 'center 'center (place-image APPLEUNIT 13 13 (place-image TAIL 188 238 (place-image SNAKEUNIT 213 238 (place-image SNAKEHEAD 238 238 BACKGROUND)))) GAMEBACK))
 
 ; Code
 (define (draw-appstate state)                          ; draw a image of the appstate at moment
-  (overlay (place-image APPLEUNIT                      ; an Apple
-               (posn-x (appstate-apple state))         ; x coordinate
-               (posn-y (appstate-apple state))         ; y coordinate
-               (draw-snake (appstate-snake state)))    ; a Snake call its own function to draw itself
-               GAMEBACK))   
+  (overlay/align 'center 'center (place-image APPLEUNIT                      ; an Apple
+                                              (posn-x (appstate-apple state))         ; x coordinate
+                                              (posn-y (appstate-apple state))         ; y coordinate
+                                              (draw-snake (appstate-snake state)))    ; a Snake call its own function to draw itself
+                 GAMEBACK))
 
 
 ;;;;;;;;;; EATING ;;;;;;;;;;
