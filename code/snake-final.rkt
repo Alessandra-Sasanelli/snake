@@ -39,7 +39,7 @@
 ; the first example of an Apple
 (define APPLE1 (compute-apple-position (random 401) 1 (compute-available-pos (cons (make-posn 0 0)(snake-position SNAKE1)) BACKGROUNDPOS)))
 
-
+(define GAMEBACK (bitmap "../resources/game-background.png"))
 ;;;;;;;;;;;;;;;;;;;; FUNCTIONS ;;;;;;;;;;;;;;;;;;;;
 
 
@@ -86,10 +86,11 @@
 
 ; Code
 (define (draw-appstate state)                          ; draw a image of the appstate at moment
-  (place-image APPLEUNIT                               ; an Apple
+  (overlay (place-image APPLEUNIT                      ; an Apple
                (posn-x (appstate-apple state))         ; x coordinate
                (posn-y (appstate-apple state))         ; y coordinate
-               (draw-snake (appstate-snake state))))   ; a Snake call its own function to draw itself
+               (draw-snake (appstate-snake state)))    ; a Snake call its own function to draw itself
+               GAMEBACK))   
 
 
 ;;;;;;;;;; EATING ;;;;;;;;;;
