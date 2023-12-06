@@ -200,37 +200,37 @@
                               (make-snake (list (make-posn 413 113) (make-posn 388 113) (make-posn 363 113)) 3 UP)
                               APPLE1
                               GAME-T
-                              QUIT-F)) 0.9)
+                              QUIT-F)) 0.4)
 
 (check-expect (time-tick (make-appstate
                               (make-snake (list (make-posn 188 113) (make-posn 163 113) (make-posn 138 113) (make-posn 113 113)) 4 UP)
                               APPLE1
                               GAME-T
-                              QUIT-F)) 0.675)
+                              QUIT-F)) 0.3)
               
 (check-expect (time-tick (make-appstate
                               (make-snake (list (make-posn 363 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 263 88)) 5 UP)
                               APPLE1
                               GAME-T
-                              QUIT-F)) 0.54)
+                              QUIT-F)) 0.24)
 
 (check-expect (time-tick (make-appstate
                               (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63)) 3 UP)
                               APPLE1
                               GAME-T
-                              QUIT-F)) 0.9)
+                              QUIT-F)) 0.4)
 
 (check-expect (time-tick (make-appstate
                               SNAKE1
                               APPLE1
                               GAME-T
-                              QUIT-F)) 0.9)
+                              QUIT-F)) 0.4)
 
 ; Code
 (define (time-tick state) 0.4); (/ 1 (snake-length (appstate-snake state)))) ; longer the snake is, faster the game will be because the tick will decrease
  
 
-;;;;;;;;;; RESET ;;;;;;;;;;1
+;;;;;;;;;; RESET ;;;;;;;;;;
 ; reset: AppState -> AppState
 ; changes the game in the appstate
 ; Header (define (reset state) DEFAULT
