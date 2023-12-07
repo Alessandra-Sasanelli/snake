@@ -6,8 +6,10 @@
 ;  - anything else lowercase using kebab-case
 
 ;; Libraries
+(require racket/base)
 (require 2htdp/universe)
-(require 2htdp/image)
+(require 2htdp/image
+         (only-in racket/gui/base play-sound))
 
 ;; Our external files
 (require "external-files/snake.rkt")
@@ -28,7 +30,7 @@
 ; - apple is an Apple
 ; - game is a Game
 ; - quit is a Quit
-(define-struct appstate [snake apple game quit])
+(define-struct appstate [snake apple game quit] #:transparent)
 
 
 ;;;;;;;;;;;;;;;;;;;; CONSTANTS ;;;;;;;;;;;;;;;;;;;;
@@ -168,7 +170,7 @@
 
 ; Code
 (define (eating state)
-    (make-appstate                                                                                                                                        ; if the function is called create a new appstate where :
+    (begin (play-sound "../resources/sounds/apple-eaten.wav" #true)(make-appstate                                                                                                                                        ; if the function is called create a new appstate where :
      (move-snake                                                                                                                                            ; the snake moves
       (make-snake                                                                                                                                           ; and it is composed by:
        (cons (first (snake-position (appstate-snake state))) (snake-position (appstate-snake state)))                                                         ; the both position of previous snake and apple
@@ -179,7 +181,7 @@
        (snake-direction (appstate-snake state))))                                                                                                             ; the snake's direction is the same
      (compute-apple-position (random 401) 1 (compute-available-pos (cons (appstate-apple state) (snake-position (appstate-snake state))) BACKGROUNDPOS))    ; the apple's position is changed
      (appstate-game state)                                                                                                                                  ; the game's appstate is the same
-     (appstate-quit state)))                                                                                                                                ; the quit's appstate is the same
+     (appstate-quit state))))                                                                                                                               ; the quit's appstate is the same
 
 
 ;;;;;;;;;; MOVE ;;;;;;;;;;
