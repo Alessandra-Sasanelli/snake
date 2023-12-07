@@ -48,8 +48,6 @@
 (define HOME (bitmap "../resources/Snake.png"))
 
 ; the writing game over
-;(define GAME-OVER (bitmap "../resources/game_over.png"))
-;(define GAME-OVER (bitmap "../resources/game-over.png"))
 (define GAME-OVER (bitmap "../resources/gameover.png"))
 
 
@@ -156,7 +154,7 @@
 (define (draw-game state)
   (cond
     [(equal? #false (appstate-game state))  HOME]                                                          ; the game in off
-    [(equal? #true (appstate-quit state)) (overlay/align 'center 'center GAME-OVER (draw-appstate state))] ; the game is over
+    ;[(equal? #true (appstate-quit state)) (overlay/align 'center 'center GAME-OVER (draw-appstate state))] ; the game is over
     [else (draw-appstate state)]))                                                                         ; the game is on
 
 
@@ -741,6 +739,21 @@
     [else #true]))                                                                            ; for any other case the application turn off
 
 
+;;;;;;;;;; DRAW END ;;;;;;;;;;
+; draw-end: AppState -> Image
+; draw the game over screen
+; Header (define (draw-game state) image)
+
+; Examples
+
+; Code
+(define (draw-end state)
+  (place-image
+   (text (number->string (* 100 (- (snake-length (appstate-snake state)) 3))) 55 'black)   ; a score point on the right
+   618 105                                                                                 ; its x and y position
+   (overlay/align 'center 'center GAME-OVER GAMEBACK)))                                    ; put the write on the background
+
+
 ;;;;;;;;;; MAIN APPLICATIONS ;;;;;;;;;;
 ; the default AppState
 (define DEFAULT (make-appstate SNAKE1 APPLE1 GAME-F QUIT-F))
@@ -750,6 +763,6 @@
     [to-draw draw-game]          ; draw the home; then snake, apple and score and finally game over on the background
     [on-key handle-keyboard]     ; start the game and then change snake's direction, reset game or quit the game
     [on-tick move 0.08]          ; uptade snake's position
-    ;[display-mode 'fullscreen ] ; the display automatically becomes full screen
+    ;[display-mode 'fullscreen ]  ; the display automatically becomes full screen
     [name "Snake Game"]          ; give a name to the game's display
-    [stop-when end? draw-game])) ; quit the application with a write
+    [stop-when end? draw-end]))  ; quit the application with a write
