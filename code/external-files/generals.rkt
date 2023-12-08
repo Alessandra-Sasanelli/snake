@@ -7,6 +7,10 @@
 
 (provide BACKGROUND
          GAMEBACK
+         GAME-OVER
+         HOME
+         APPLEUNIT
+         EATEN
          UP
          DOWN
          RIGHT
@@ -16,7 +20,6 @@
          QUIT-T
          QUIT-F
          last)
-
 
 ;;;;;;;;;;;;;;;;;;;; DATA TYPES ;;;;;;;;;;;;;;;;;;;;
 ; a Direction is one of these String
@@ -36,6 +39,15 @@
 
 (define BACKGROUND (bitmap "../../resources/snake-background.png"))
 (define GAMEBACK (bitmap "../../resources/game-background.png"))
+; Home background
+(define HOME (bitmap "../../resources/Snake.png"))
+; the writing game over
+(define GAME-OVER (bitmap "../../resources/gameover.png"))
+
+; AppleUnit
+(define APPLEUNIT (bitmap "../../resources/apple.png"))
+
+(define EATEN "../resources/sounds/apple-eaten.wav")
 
 ; Directions
 (define UP "up")
@@ -50,6 +62,7 @@
 ; the quit
 (define QUIT-T #true)
 (define QUIT-F #false)
+
 
 ;;;;;;;;;;;;;;;;;;;; FUNCTIONS ;;;;;;;;;;;;;;;;;;;;
 
