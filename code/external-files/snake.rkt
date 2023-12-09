@@ -225,9 +225,9 @@
 ; Code
 (define (check-eat-snake snake)
   (cond
-    [(empty? (rest (snake-position snake))) #false]                               ; if the snake is finished it means that it has not eaten itself
-    [(equal? (last (snake-position snake)) (first (snake-position snake))) #true] ; if the snake hits its tail, it's game over
-    [else (check-eat-snake                                                        ; otherwise use the recursive call to check if it hits a part of its body, where the snake is made up of :
+    [(empty? (rest (snake-position snake))) #false]                                 ; if the snake is finished it means that it has not eaten itself
+    [(equal? (last (snake-position snake)) (first (snake-position snake))) #true]   ; if the snake hits its tail, it's game over
+    [else (check-eat-snake                                                          ; otherwise use the recursive call to check if it hits a part of its body, where the snake is made up of :
            (make-snake (rest (snake-position snake))                                ; the rest of the body
                        (snake-length snake)                                         ; the snake's length is the same
                        (snake-direction snake)))]))                                 ; the snake's direction is the same

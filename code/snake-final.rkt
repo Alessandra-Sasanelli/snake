@@ -38,6 +38,8 @@
 ; on-tick variables
 (define TICK 0)
 (define RATE 5)
+; key counter to have only one key per tick
+(define KEYCOUNT 0)
 
 
 ;;;;;;;;;;;;;;;;;;;; FUNCTIONS ;;;;;;;;;;;;;;;;;;;;
@@ -140,18 +142,14 @@
 ; Code
 (define (draw-game state)
   (cond
-    [(not (appstate-game state)) HOME] ; the game in off
-    [(end? state) (draw-end state)]            ; the game is lost
+    [(end? state) (draw-end state)]    ; the game is lost
+    [(not (appstate-game state)) HOME] ; the game is off
     [else (draw-appstate state)]))     ; the game is running                                                                        ; the game is on
-
 
 ;;;;;;;;;; EATING ;;;;;;;;;;
 ; eating : AppState -> AppState
 ; when the apple is eating by the snake, it will become more longer and the apple's position will uptate
 ; Header (define (eating DEFAULT) DEFAULT)
-
-; Examples
-; the apple's position is randomic so it is impossible to do some examples because we cannot predict its position
 
 ; Code
 (define (eating state)
@@ -234,8 +232,14 @@
 
 ; Code
 (define (move state)
-  (cond
-    [(equal? #false (appstate-game state)) state]                                                                ; if the game is off, the snake must not move
+  (cond                                                                ; if the game is off, the snake must not move
+    [(end? state)
+     (make-appstate
+      (appstate-snake state)
+      (appstate-apple state)
+      #false
+      #false)]
+    [(not (appstate-game state)) state]
     [else
      (begin (set! TICK (add1 TICK))                                                                              ; update tick to one
             (cond
@@ -251,7 +255,7 @@
 
 ;;;;;;;;;; START ;;;;;;;;;;
 ; start: AppState -> AppState
-; starts the game, chanching the canvas
+; starts the game, changing the canvas
 ; Header (define (start DEFAULT) DEFAULT)
 
 ; Examples
@@ -354,9 +358,12 @@
 
 ; Code
 (define (reset state)
-  (cond
-    [(appstate-game state) (begin (set! RATE 5) DEFAULT)] ; the game is reset
-    [else state]))                                        ; the game continue to run
+  (begin (set! RATE 5)
+         (make-appstate
+          SNAKE1
+          (compute-apple-position (random 401) 1 (compute-available-pos (cons (appstate-apple state)(snake-position SNAKE1)) BACKGROUNDPOS))
+          #false
+          #false)))                                        ; the game continue to run
 
 
 ;;;;;;;;;; QUIT ;;;;;;;;;;
@@ -412,8 +419,8 @@
                QUIT-T))
 
 ; Code
-(define (quit state) (appstate-quit state))                
- 
+(define (quit state)
+  (appstate-quit state))                
 
 ;;;;;;;;;; HANDLE KEYBOARD ;;;;;;;;;;
 ; handle-keyboard: AppState KeyboardEvent -> AppState
@@ -667,17 +674,14 @@
                      GAME-T
                      QUIT-F)) #false)
 
-
 (define (end? state)
-  (or (check-position-out (last (snake-position (appstate-snake state))) BACKGROUNDPOS)
+    (or (check-position-out (last (snake-position (appstate-snake state))) BACKGROUNDPOS)
       (check-eat-snake (appstate-snake state))))
 
 ;;;;;;;;;; DRAW END ;;;;;;;;;;
 ; draw-end: AppState -> Image
-; draw the game over screen
+; draws the game over screen
 ; Header (define (draw-game DEFAULT) BACKGROUND)
-
-; Examples
 
 ; Code
 (define (draw-end state)
@@ -686,15 +690,15 @@
    618 105                                                                                 ; its x and y position
    (overlay/align 'center 'center GAME-OVER GAMEBACK)))                                    ; put the write on the background
 
-
+ 
 ;;;;;;;;;; MAIN APPLICATIONS ;;;;;;;;;;
 ; the default AppState
 (define DEFAULT (make-appstate SNAKE1 APPLE1 GAME-F QUIT-F))
 
 (define (snake-game appstate)
   (big-bang appstate
-    [to-draw draw-game]          ; draw the home; then snake, apple and score and finally game over on the background
-    [on-key handle-keyboard]     ; start the game and then change snake's direction, reset game or quit the game
+    [to-draw draw-game]                                    ; draw the home; then snake, apple and score and finally game over on the background
+    [on-key handle-keyboard]                               ; start the game and then change snake's direction, reset game or quit the game
     [on-tick move FASTSPEED]     ; update snake's position
     ;[display-mode 'fullscreen]  ; the display automatically becomes full screen
     [name "Snake Game"]          ; give a name to the game's display
