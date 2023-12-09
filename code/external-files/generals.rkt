@@ -37,15 +37,15 @@
 ; - #false   : the game is on and is running
 ; - #true    : the game is off and "close"
 
-(define BACKGROUND (bitmap "../../resources/snake-background.png"))
-(define GAMEBACK (bitmap "../../resources/game-background.png"))
+(define BACKGROUND (bitmap "../../resources/images/snake-background.png"))
+(define GAMEBACK (bitmap "../../resources/images/game-background.png"))
 ; Home background
-(define HOME (bitmap "../../resources/Snake.png"))
+(define HOME (bitmap "../../resources/images/Snake.png"))
 ; the writing game over
-(define GAME-OVER (bitmap "../../resources/gameover.png"))
+(define GAME-OVER (bitmap "../../resources/images/gameover.png"))
 
 ; AppleUnit
-(define APPLEUNIT (bitmap "../../resources/apple.png"))
+(define APPLEUNIT (bitmap "../../resources/images/apple.png"))
 
 (define EATEN "../resources/sounds/apple-eaten.wav")
 
@@ -65,8 +65,6 @@
 
 
 ;;;;;;;;;;;;;;;;;;;; FUNCTIONS ;;;;;;;;;;;;;;;;;;;;
-
-
 ;;;;;;;;;; LAST ;;;;;;;;;;
 ; last: List<Any> -> List<Any>
 ; returns the last element of a list

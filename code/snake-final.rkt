@@ -135,14 +135,14 @@
                               (compute-apple-position 396 1 (compute-available-pos (cons (make-posn 88 13) (snake-position SNAKE1)) BACKGROUNDPOS))
                               GAME-F
                               QUIT-F))
-               HOME)
+               HOME) 
 
 ; Code
 (define (draw-game state)
   (cond
-    [(equal? #false (appstate-game state))  HOME]                                                          ; the game in off
-    ;[(equal? #true (appstate-quit state)) (overlay/align 'center 'center GAME-OVER (draw-appstate state))]; the game is over
-    [else (draw-appstate state)]))                                                                         ; the game is on
+    [(not (appstate-game state)) HOME] ; the game in off
+    [(end? state) (draw-end state)]            ; the game is lost
+    [else (draw-appstate state)]))     ; the game is running                                                                        ; the game is on
 
 
 ;;;;;;;;;; EATING ;;;;;;;;;;
@@ -355,8 +355,8 @@
 ; Code
 (define (reset state)
   (cond
-    [(boolean=? (appstate-game state) #true) DEFAULT] ; the game continue to run
-    [else state]))                                    ; the game is reset
+    [(appstate-game state) (begin (set! RATE 5) DEFAULT)] ; the game is reset
+    [else state]))                                        ; the game continue to run
 
 
 ;;;;;;;;;; QUIT ;;;;;;;;;;
@@ -412,11 +412,7 @@
                QUIT-T))
 
 ; Code
-(define (quit state) (make-appstate
-                      (appstate-snake state) ; the snake remain the same
-                      (appstate-apple state) ; the apple remain the same
-                      (appstate-game state)  ; the game remain the same
-                      #true))                ; the quit change to quit the application
+(define (quit state) (appstate-quit state))                
  
 
 ;;;;;;;;;; HANDLE KEYBOARD ;;;;;;;;;;
@@ -572,25 +568,19 @@
 (define (handle-keyboard state key)
   (cond    
     [(not (string? key)) state]                                                                          ; for any possible not-string key input, the output is the same AppState as before
-
     [(string=? key "s") (start state)]                                                                   ; start the game
-
     [(or (and (string=? key "up") (string=? (snake-direction (appstate-snake state)) "down"))            ; if the direction is opposite of the key, the state is the same
          (and (string=? key "right") (string=? (snake-direction (appstate-snake state)) "left"))        
          (and (string=? key "down") (string=? (snake-direction (appstate-snake state)) "up"))           
          (and (string=? key "left") (string=? (snake-direction (appstate-snake state)) "right"))) state]
-    
     [(or (string=? key "up") (string=? key "right") (string=? key "down") (string=? key "left"))         ; if the input is one of 'up', 'right', 'down' or 'left'
      (make-appstate                                                                                      ; create a new appstate where :
       (change-snake-direction key (appstate-snake state))                                                  ; the new snake is returned by the function to change the snake's direction
       (appstate-apple state)                                                                               ; the apple's appstate is the same
       (appstate-game state)                                                                                ; the game's appstate is the same
       (appstate-quit state))]                                                                              ; the quit's appstate is the same
-    
     [(string=? key "r") (reset state)]                                                                   ; reset the game
-    
     [(string=? key "escape") (quit state)]                                                               ; quit the game
-
     [else state]))                                                                                       ; for any other input the appstate is the same
 
 
@@ -676,15 +666,11 @@
                      APPLE1
                      GAME-T
                      QUIT-F)) #false)
- 
-; Code
-(define (end? state)
-  (cond
-    [(check-position-out (last (snake-position (appstate-snake state))) BACKGROUNDPOS) #true] ; if the snake is over background's limits, the application turn off
-    [(check-eat-snake (appstate-snake state)) #true]                                          ; if the snake hits itself, the application turn off
-    [(boolean=? (appstate-quit state) #false) #false]                                         ; the application remains on
-    [else #true]))                                                                            ; for any other case the application turn off
 
+
+(define (end? state)
+  (or (check-position-out (last (snake-position (appstate-snake state))) BACKGROUNDPOS)
+      (check-eat-snake (appstate-snake state))))
 
 ;;;;;;;;;; DRAW END ;;;;;;;;;;
 ; draw-end: AppState -> Image
@@ -709,7 +695,7 @@
   (big-bang appstate
     [to-draw draw-game]          ; draw the home; then snake, apple and score and finally game over on the background
     [on-key handle-keyboard]     ; start the game and then change snake's direction, reset game or quit the game
-    [on-tick move FASTSPEED]          ; uptade snake's position
-    ;[display-mode 'fullscreen ]  ; the display automatically becomes full screen
+    [on-tick move FASTSPEED]     ; update snake's position
+    ;[display-mode 'fullscreen]  ; the display automatically becomes full screen
     [name "Snake Game"]          ; give a name to the game's display
-    [stop-when end? draw-end]))  ; quit the application with a write
+    [stop-when quit]))           ; quit the application

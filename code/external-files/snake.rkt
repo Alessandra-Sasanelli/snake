@@ -48,7 +48,7 @@
 (define TAIL (put-image SNAKEUNIT 24 12 (circle 12 'solid 'green)))
 
 ; background
-(define BACKGROUND (bitmap "../../resources/snake-background.png"))
+(define BACKGROUND (bitmap "../../resources/images/snake-background.png"))
 
 
 ;;;;;;;;;;;;;;;;;;;; DATA TYPES ;;;;;;;;;;;;;;;;;;;;
