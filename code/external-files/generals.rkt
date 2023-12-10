@@ -63,6 +63,17 @@
 (define QUIT-T #true)
 (define QUIT-F #false)
 
+(define NUMBERS (list
+                 (make-posn 0 "../../resources/numbers/0.png")
+                 (make-posn 1 "../../resources/numbers/1.png")
+                 (make-posn 2 "../../resources/numbers/2.png")
+                 (make-posn 3 "../../resources/numbers/3.png")
+                 (make-posn 4 "../../resources/numbers/4.png")
+                 (make-posn 5 "../../resources/numbers/5.png")
+                 (make-posn 6 "../../resources/numbers/6.png")
+                 (make-posn 7 "../../resources/numbers/7.png")
+                 (make-posn 8 "../../resources/numbers/8.png")
+                 (make-posn 9 "../../resources/numbers/9.png")))
 
 ;;;;;;;;;;;;;;;;;;;; FUNCTIONS ;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; LAST ;;;;;;;;;;
@@ -83,3 +94,18 @@
     [(empty? (rest lop)) (first lop)] ; base case: when rest is empty, just return the element
     [else
      (last (rest lop))]))             ; recursive case: discard all other elements
+
+; number->path: Number -> String
+; takes in a number and returns it as a path
+(define (number->path num)
+  (posn-y (first (filter (lambda (pos) (equal? (posn-x pos) num)) NUMBERS))))
+
+; string->image: String<Number> Number -> Image
+; takes in a number and returns it as an image
+(define (number->image str n)
+  (cond
+    [(= n (- (string-length str) 1)) (bitmap/file (number->path (string->number (string (string-ref str n)))))]
+    [else
+     (overlay/offset (bitmap/file (number->path (string->number (string (string-ref str n)))))
+                     60 0
+     (number->image str (add1 n)))]))

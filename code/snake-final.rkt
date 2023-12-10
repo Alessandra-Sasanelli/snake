@@ -587,7 +587,12 @@
       (appstate-game state)                                                                                ; the game's appstate is the same
       (appstate-quit state))]                                                                              ; the quit's appstate is the same
     [(string=? key "r") (reset state)]                                                                   ; reset the game
-    [(string=? key "escape") (quit state)]                                                               ; quit the game
+    [(string=? key "escape")
+     (make-appstate                                                                                      ; create a new appstate where :
+      (change-snake-direction key (appstate-snake state))                                                  ; the new snake is returned by the function to change the snake's direction
+      (appstate-apple state)                                                                               ; the apple's appstate is the same
+      (appstate-game state)                                                                                ; the game's appstate is the same
+      #true)]                                                               ; quit the game
     [else state]))                                                                                       ; for any other input the appstate is the same
 
 
@@ -699,7 +704,8 @@
   (big-bang appstate
     [to-draw draw-game]                                    ; draw the home; then snake, apple and score and finally game over on the background
     [on-key handle-keyboard]                               ; start the game and then change snake's direction, reset game or quit the game
-    [on-tick move FASTSPEED]     ; update snake's position
-    ;[display-mode 'fullscreen]  ; the display automatically becomes full screen
-    [name "Snake Game"]          ; give a name to the game's display
-    [stop-when quit]))           ; quit the application
+    [on-tick move FASTSPEED]                               ; update snake's position
+    ;[display-mode 'fullscreen]                            ; the display automatically becomes full screen
+    [name "Snake Game"]                                    ; give a name to the game's display
+    [close-on-stop #true]
+    [stop-when quit]))                                     ; quit the application
