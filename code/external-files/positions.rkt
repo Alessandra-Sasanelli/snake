@@ -210,10 +210,10 @@
 ; Code
 (define (compute-new-posn pos dir)
   (cond                                                                        ; every tick it update the position in according with the input is a direction, and if it is :
-    [(equal? dir UP) (make-posn (posn-x pos) (decrement-pos (posn-y pos)))]     ; up, it drecreas the y
-    [(equal? dir RIGHT) (make-posn (increment-pos (posn-x pos)) (posn-y pos))]  ; right, increase the x
-    [(equal? dir DOWN) (make-posn (posn-x pos) (increment-pos (posn-y pos)))]   ; down, increase the y
-    [(equal? dir LEFT) (make-posn (decrement-pos (posn-x pos)) (posn-y pos))]   ; left, decrease the x
+    [(equal? dir UP) (make-posn (posn-x pos) (decrement-pos (posn-y pos)))]      ; up, it drecreas the y
+    [(equal? dir RIGHT) (make-posn (increment-pos (posn-x pos)) (posn-y pos))]   ; right, increase the x
+    [(equal? dir DOWN) (make-posn (posn-x pos) (increment-pos (posn-y pos)))]    ; down, increase the y
+    [(equal? dir LEFT) (make-posn (decrement-pos (posn-x pos)) (posn-y pos))]    ; left, decrease the x
     [else pos]))                                                               ; otherwise ii returns the original position
 
 
@@ -232,10 +232,10 @@
 ; Code
 (define (direction-by-posn posb posa)
   (cond                                      ; if the x or y of two positions are:
-    [(< (posn-y posa) (posn-y posb)) UP]      ; the first one y is less the second, the direction is up
-    [(> (posn-x posa) (posn-x posb)) RIGHT]   ; the first one x is greater the second, the direction is right
-    [(> (posn-y posa) (posn-y posb)) DOWN]    ; the first one y is greater the second, the direction is down
-    [(< (posn-x posa) (posn-x posb)) LEFT]))  ; the first one x is less the second, the direction is left
+    [(< (posn-y posa) (posn-y posb)) UP]       ; the first one y is less the second, the direction is up
+    [(> (posn-x posa) (posn-x posb)) RIGHT]    ; the first one x is greater the second, the direction is right
+    [(> (posn-y posa) (posn-y posb)) DOWN]     ; the first one y is greater the second, the direction is down
+    [(< (posn-x posa) (posn-x posb)) LEFT]))   ; the first one x is less the second, the direction is left
 
 
 ;;;;;;;;;; UPDATE-POSITIONS ;;;;;;;;;;
