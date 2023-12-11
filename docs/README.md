@@ -55,6 +55,7 @@ MILESTONE
 FINAL
 --------------------------------------------------------------------------------
     CHANGES FROM MILESTONE
+    - added two fields to appstate struct: tick and rate
     - deleted Breakpoint
     - deleted field breakpositions to the snake struct
     - definition of List<Posn> changed
@@ -78,8 +79,8 @@ FINAL
           of posn based on last two posns direction
     NOT PROVIDED
       functions:
-        - function to update a posn based on the direction
-        - function to delete a posn from a list if present
+        - compute-new-posn --> update a posn based on the direction
+        - delete-el --> delete a posn from a list if present
 
     SNAKE FILE (snake.rkt)
     PROVIDES:
@@ -96,7 +97,7 @@ FINAL
         - check-eat-snake --> check if the snake hit itself during the game
     NOT PROVIDED
       functions:
-        - rotate-el: rotates image based on direction
+        - rotate-el --> rotates image based on direction
 
     GENERALS FILE (generals.rkt)
     PROVIDES:
@@ -127,11 +128,7 @@ FINAL
     CONSTANTS: 
       - APPLE
       - FASTSPEED
-    VARIABLES:
-      - TICK
-      - RATE
     functions:
-      - initialize-rate --> reset state variable RATE
       - draw-appstate --> draws the appstate
       - draw-end --> draws the game over screen
       - draw-game --> decide to draw wheather the home or the game
