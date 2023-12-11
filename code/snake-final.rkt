@@ -275,6 +275,75 @@
     [(not (appstate-game state)) HOME] ; the game is off
     [else (draw-appstate state)]))     ; the game is running
 
+;;;;;;;;;; EATING ;;;;;;;;;;
+; eating : AppState -> AppState
+; when the apple is eaten by the snake,
+; it will become more longer and the apple's position will update
+; It will also play the eaten sound
+; Header (define (eating DEFAULT) DEFAULT)
+
+; Code
+(define (eating state)
+  (begin (play-sound EATEN #true)
+         (make-appstate                                                                                                                                       ; if the function is called create a new appstate where :
+          (move-snake                                                                                                                                           ; the snake moves
+           (make-snake                                                                                                                                            ; and it is composed by:
+            (cons (first (snake-position (appstate-snake state))) (snake-position (appstate-snake state)))                                                          ; the both position of previous snake and apple
+                                                                                                                                       ; the rate is the same
+            (add1 (snake-length (appstate-snake state)))                                                                                                    ; the snake's length is greater than one
+            (snake-direction (appstate-snake state))))                                                                                                              ; the snake's direction is the same
+          (compute-apple-position (random 401) 1 (compute-available-pos (cons (appstate-apple state) (snake-position (appstate-snake state))) BACKGROUNDPOS))   ; the apple's position is changed
+          (appstate-game state)                                                                                                                                 ; the game's appstate is the same
+          (appstate-quit state)
+          (appstate-tick state)
+          (if
+           (and (> (sub1 (appstate-rate state)) 0) (= 0 (remainder (- 3 (snake-length (appstate-snake state))) 3)))                                           ; then check whether to increase the speed :
+           (sub1 (appstate-rate state))                                                                                                                         ; the rate is less than one
+           (appstate-rate state)))))                                                                                                                              ; the quit's appstate is the same
+
+
+;;;;;;;;;; MOVE ;;;;;;;;;;
+; move: AppState -> AppState
+; moves the snake using an auxiliary function
+; write state: TICK (adds one everytime it is called)
+; read state:  RATE 
+; Header (define (move DEFAULT) DEFAULT)
+
+; Code
+(define (move state)
+  (cond                                                                                                          ; if the game is off, the snake must not move
+    [(end? state)
+     (make-appstate
+      (appstate-snake state)
+      (appstate-apple state)
+      #false
+      #false
+      (appstate-tick state)
+      (appstate-rate state))]
+    [(not (appstate-game state)) state]                                                                          ; 
+    [else                                                                            ; update tick to one
+     (cond
+       [(= (remainder
+            (appstate-tick state)
+            (appstate-rate state)) 0)                                                                       ; 
+        (cond
+          [(equal? (last (snake-position (appstate-snake state))) (appstate-apple state)) (eating state)] ; if the snake is eating call the function to upgrade both its length and apple's position
+          [else  (make-appstate                                                                           ; every tick the appstate is moved and it creates a new update where it is made by :
+                  (move-snake (appstate-snake state))                                                       ; the new position of the snake
+                  (appstate-apple state)                                                                    ; the apple's state is the same
+                  (appstate-game state)                                                                     ; the game's state is the same
+                  (appstate-quit state)
+                  (add1 (appstate-tick state))
+                  (appstate-rate state))])]                                                                 ; the quit's state is the same
+       [else
+        (make-appstate                                                                           ; every tick the appstate is moved and it creates a new update where it is made by :
+         (appstate-snake state)                                                      ; the new position of the snake
+         (appstate-apple state)                                                                    ; the apple's state is the same
+         (appstate-game state)                                                                     ; the game's state is the same
+         (appstate-quit state)
+         (add1 (appstate-tick state))
+         (appstate-rate state))])]))                                                                                 ; otherwise give the same appstate as before
+
 
 ;;;;;;;;;; START ;;;;;;;;;;
 ; start: AppState -> AppState
@@ -360,7 +429,6 @@
 ;;;;;;;;;; RESET ;;;;;;;;;;
 ; reset: AppState -> AppState
 ; changes the game in the appstate
-; modify state: RATE
 ; Header (define (reset DEFAULT) DEFAULT)
 
 ; Code
