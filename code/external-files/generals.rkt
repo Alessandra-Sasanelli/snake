@@ -3,7 +3,8 @@
 #reader(lib "htdp-advanced-reader.ss" "lang")((modname generals) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
 ; Here are present some constants and some general functions
 (require racket/base)
-(require 2htdp/image)
+(require 2htdp/image
+         (only-in racket/gui/base play-sound))
 
 (provide BACKGROUND
          GAMEBACK
@@ -12,6 +13,7 @@
          APPLEUNIT
          EATEN
          DEATH
+         OST
          UP
          DOWN
          RIGHT
@@ -20,7 +22,8 @@
          GAME-F
          QUIT-T
          QUIT-F
-         last)
+         last
+         play-ost)
 
 ;;;;;;;;;;;;;;;;;;;; DATA TYPES ;;;;;;;;;;;;;;;;;;;;
 ; a Direction is one of these String
@@ -51,6 +54,7 @@
 (define EATEN "../resources/sounds/apple-eaten.mp3")
 
 (define DEATH "../resources/sounds/gameover.wav")
+(define OST "../resources/sounds/ost.mp3")
 
 ; Directions
 (define UP "up")
@@ -111,3 +115,10 @@
     [else
      (beside (bitmap/file (number->path (string->number (string (string-ref str n)))))
      (number->image str (add1 n)))]))
+
+; play-ost: Number -> (void)
+(define (play-ost tick rate path)
+  (cond
+    [(= (remainder tick rate) 0) (play-sound path #true)]
+    [else
+     #true]))
