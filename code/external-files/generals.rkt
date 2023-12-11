@@ -11,6 +11,7 @@
          HOME
          APPLEUNIT
          EATEN
+         DEATH
          UP
          DOWN
          RIGHT
@@ -47,7 +48,9 @@
 ; AppleUnit
 (define APPLEUNIT (bitmap "../../resources/images/apple.png"))
 
-(define EATEN "../resources/sounds/apple-eaten.wav")
+(define EATEN "../resources/sounds/apple-eaten.mp3")
+
+(define DEATH "../resources/sounds/gameover.wav")
 
 ; Directions
 (define UP "up")
