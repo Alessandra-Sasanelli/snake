@@ -20,7 +20,8 @@
          GAME-F
          QUIT-T
          QUIT-F
-         last)
+         last
+         number->image)
 
 ;;;;;;;;;;;;;;;;;;;; DATA TYPES ;;;;;;;;;;;;;;;;;;;;
 ; a Direction is one of these String
@@ -67,16 +68,16 @@
 (define QUIT-F #false)
 
 (define NUMBERS (list
-                 (make-posn 0 "../../resources/numbers/0.png")
-                 (make-posn 1 "../../resources/numbers/1.png")
-                 (make-posn 2 "../../resources/numbers/2.png")
-                 (make-posn 3 "../../resources/numbers/3.png")
-                 (make-posn 4 "../../resources/numbers/4.png")
-                 (make-posn 5 "../../resources/numbers/5.png")
-                 (make-posn 6 "../../resources/numbers/6.png")
-                 (make-posn 7 "../../resources/numbers/7.png")
-                 (make-posn 8 "../../resources/numbers/8.png")
-                 (make-posn 9 "../../resources/numbers/9.png")))
+                 (make-posn 0 "../resources/numbers/0.png")
+                 (make-posn 1 "../resources/numbers/1.png")
+                 (make-posn 2 "../resources/numbers/2.png")
+                 (make-posn 3 "../resources/numbers/3.png")
+                 (make-posn 4 "../resources/numbers/4.png")
+                 (make-posn 5 "../resources/numbers/5.png")
+                 (make-posn 6 "../resources/numbers/6.png")
+                 (make-posn 7 "../resources/numbers/7.png")
+                 (make-posn 8 "../resources/numbers/8.png")
+                 (make-posn 9 "../resources/numbers/9.png")))
 
 ;;;;;;;;;;;;;;;;;;;; FUNCTIONS ;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; LAST ;;;;;;;;;;
@@ -107,7 +108,7 @@
 ; takes in a number and returns it as an image
 (define (number->image str n)
   (cond
-    [(= n (- (string-length str) 1)) (bitmap/file (number->path (string->number (string (string-ref str n)))))]
+    [(= n (- (string-length str) 1)) (bitmap/file (number->path (string->number (string (string-ref str n)))))] ; base case where call the right path for each number
     [else
-     (beside (bitmap/file (number->path (string->number (string (string-ref str n)))))
-     (number->image str (add1 n)))]))
+     (beside (bitmap/file (number->path (string->number (string (string-ref str n)))))                          ; recursive case where place the numbers' image next to each other
+             (number->image str (add1 n)))]))                                                                   ; calls itself for the next number
