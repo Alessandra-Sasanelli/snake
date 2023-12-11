@@ -30,8 +30,6 @@
 
 
 ;;;;;;;;;;;;;;;;;;;; FUNCTIONS ;;;;;;;;;;;;;;;;;;;;
-
-
 ;;;;;;;;;; MAKE POSITIONS ;;;;;;;;;;
 ; make-positions: Number Number Number List<Posn> -> List<Posn>
 ; computes all the positions on the background before the game starts

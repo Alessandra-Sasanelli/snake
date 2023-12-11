@@ -44,6 +44,7 @@
 ; TICK: Integer
 ; the number of ticks the clock ticked from the beginning of the program
 (define TICK 0)
+
 ; RATE: Integer
 ; the number of speed levels the snake can have
 (define RATE 5)

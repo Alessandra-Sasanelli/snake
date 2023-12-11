@@ -13,7 +13,6 @@
          APPLEUNIT
          EATEN
          DEATH
-         OST
          UP
          DOWN
          RIGHT
@@ -23,7 +22,6 @@
          QUIT-T
          QUIT-F
          last
-         play-ost
          number->image)
 
 ;;;;;;;;;;;;;;;;;;;; DATA TYPES ;;;;;;;;;;;;;;;;;;;;

@@ -20,14 +20,7 @@
          draw-snake
          check-eat-snake)
 
-
 ;;;;;;;;;;;;;;;;;;;; CONSTANTS ;;;;;;;;;;;;;;;;;;;;
-; Directions
-(define UP "up")
-(define RIGHT "right")
-(define DOWN "down")
-(define LEFT "left")
-
 ; Snake struct and one examples
 (define-struct snake [position length direction] #:transparent)
 (define SNAKE1 (make-snake (list (make-posn 188 238) (make-posn 213 238) (make-posn 238 238)) 3 RIGHT))
@@ -78,7 +71,7 @@
 
 ;;;;;;;;;; ROTATE ELEMENT ;;;;;;;;;;
 ; rotate-el: Direction Image -> Image
-; rotate the image so that whe the snake changes direction its head and tail are in the right direction
+; rotate the image so that when the snake changes direction its head and tail are in the right direction
 ; Header (define (rotate-el d img) SNAKEHEAD)
 
 ; Examples
