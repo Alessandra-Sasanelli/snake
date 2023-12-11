@@ -45,12 +45,18 @@
 ; on-tick constant
 (define FASTSPEED 0.08)
 
-; the number of ticks the clock ticked from the beginning of the program
+; counts every tick of the clock
 (define TICK 0)
 
-; the number of speed levels the snake can have
+; speed levels
 (define RATE 10)
 
+; GAMEOVRPLAYED: Boolean
+; represents weather the game-over mp3 has been played or not
+(define GAMEOVRPLAYED #false)
+
+(define (reset-gameover)
+  (set! GAMEOVRPLAYED #false))
 
 ;;;;;;;;;;;;;;;;;;;; FUNCTIONS ;;;;;;;;;;;;;;;;;;;;
 
@@ -138,8 +144,12 @@
                      QUIT-F 0 0)) #false)
 
 (define (end? state)
-  (or (check-position-out (last (snake-position (appstate-snake state))) BACKGROUNDPOS) ; return true if the snake hit the border
-      (check-eat-snake (appstate-snake state))))                                        ; or if it hit itself
+  (if (or (check-position-out (last (snake-position (appstate-snake state))) BACKGROUNDPOS) ; return true if the snake hit the border
+      (check-eat-snake (appstate-snake state)))
+      (begin (if (not GAMEOVRPLAYED) (play-sound DEATH #true) #false)
+             (begin
+               (set! GAMEOVRPLAYED #true) #true))
+      (begin (reset-gameover) #false)))
 
 
 ;;;;;;;;;; DRAW END ;;;;;;;;;;
