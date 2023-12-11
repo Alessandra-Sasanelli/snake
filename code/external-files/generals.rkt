@@ -106,6 +106,5 @@
   (cond
     [(= n (- (string-length str) 1)) (bitmap/file (number->path (string->number (string (string-ref str n)))))]
     [else
-     (overlay/offset (bitmap/file (number->path (string->number (string (string-ref str n)))))
-                     60 0
+     (beside (bitmap/file (number->path (string->number (string (string-ref str n)))))
      (number->image str (add1 n)))]))
