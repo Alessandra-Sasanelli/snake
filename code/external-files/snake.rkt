@@ -153,10 +153,10 @@
 ; Examples
 (check-expect (change-snake-direction UP SNAKE1) (make-snake (snake-position SNAKE1)
                                                              (snake-length SNAKE1)
-                                                               UP))
+                                                             UP))
 (check-expect (change-snake-direction RIGHT SNAKE1) (make-snake (snake-position SNAKE1)
                                                                 (snake-length SNAKE1)
-                                                               RIGHT))
+                                                                RIGHT))
 (check-expect (change-snake-direction DOWN SNAKE1) (make-snake (snake-position SNAKE1)
                                                                (snake-length SNAKE1)
                                                                DOWN))
