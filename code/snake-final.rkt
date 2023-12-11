@@ -13,6 +13,10 @@
 (require "external-files/generals.rkt")
 
 ;;;;;;;;;;;;;;;;;;;; DATA TYPES ;;;;;;;;;;;;;;;;;;;;
+; an Integer is a Number as such:
+; - the Number 0
+; - Integer + 1
+
 ; an AppleUnit is an Image
 ; It represents the little rectangles that the apple is made off
 
@@ -36,13 +40,19 @@
 ; on-tick constant
 (define FASTSPEED 0.08)
 
-; on-tick variables
+; VARIABLES
+; TICK: Integer
+; the number of ticks the clock ticked from the beginning of the program
 (define TICK 0)
+; RATE: Integer
+; the number of speed levels the snake can have
 (define RATE 5)
 
-; key counter to have only one key per tick
-(define KEYCOUNT 0)
-
+; intialize-reviews : -> void
+; reset state variable RATE
+; modify state: RATE
+(define (initialize-rate)
+  (set! RATE 5))
 
 ;;;;;;;;;;;;;;;;;;;; FUNCTIONS ;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; DRAW APPSTATE ;;;;;;;;;;
@@ -151,7 +161,9 @@
 
 ;;;;;;;;;; EATING ;;;;;;;;;;
 ; eating : AppState -> AppState
-; when the apple is eating by the snake, it will become more longer and the apple's position will uptate
+; when the apple is eaten by the snake,
+; it will become more longer and the apple's position will update
+; It will also play the eaten sound
 ; Header (define (eating DEFAULT) DEFAULT)
 
 ; Code
@@ -173,8 +185,9 @@
 
 ;;;;;;;;;; MOVE ;;;;;;;;;;
 ; move: AppState -> AppState
-; write: TICK (adds one everytime it is called)
 ; moves the snake using an auxiliary function
+; write state: TICK (adds one everytime it is called)
+; read state:  RATE 
 ; Header (define (move DEFAULT) DEFAULT)
 
 ; Code
@@ -265,11 +278,12 @@
 ;;;;;;;;;; RESET ;;;;;;;;;;
 ; reset: AppState -> AppState
 ; changes the game in the appstate
+; modify state: RATE
 ; Header (define (reset DEFAULT) DEFAULT)
 
 ; Code
 (define (reset state)
-  (begin (set! RATE 5)                                                                                                                       ; set the rate to 5
+  (begin (initialize-rate)                                                                                                                       ; set the rate to 5
          (make-appstate                                                                                                                      ; return a new appstate where :
           SNAKE1                                                                                                                               ; the snake it the default one
           (compute-apple-position (random 401) 1 (compute-available-pos (cons (appstate-apple state)(snake-position SNAKE1)) BACKGROUNDPOS))   ; compute a new apple's position
@@ -436,7 +450,7 @@
       (appstate-quit state))]                                                                              ; the quit's appstate is the same
     [(string=? key "r") (reset state)]                                                                   ; reset the game
     [(string=? key "escape")
-     (make-appstate                                                                                      ; create a new appstate where :
+      (make-appstate                                                                                      ; create a new appstate where :
       (appstate-snake state)                                                                               ; the snake's appstate is the same
       (appstate-apple state)                                                                               ; the apple's appstate is the same
       (appstate-game state)                                                                                ; the game's appstate is the same
@@ -543,12 +557,11 @@
    670 105 'right 'center                                                                   ; x and y of point
    (overlay/align 'center 'center GAME-OVER GAMEBACK)))                                   ; put the write on the background
 
- 
 ;;;;;;;;;; MAIN APPLICATIONS ;;;;;;;;;;
 ; the default AppState
 (define DEFAULT (make-appstate SNAKE1 APPLE1 GAME-F QUIT-F))
 
-(define (snake-game appstate)
+(define (snake-game appstate) 
   (big-bang appstate
     [to-draw draw-game]         ; draw the home; then snake, apple and score and finally game over on the background
     [on-key handle-keyboard]    ; start the game and then change snake's direction, reset game or quit the game
