@@ -3,22 +3,22 @@
 #reader(lib "htdp-advanced-reader.ss" "lang")((modname positions) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
 ; This file contains all the functions relative to the positions
 (require racket/base)
-
 (require "generals.rkt")
 
 ; export all file's functions
-(provide BACKGROUNDPOS
-         make-positions
+(provide make-positions
+         BACKGROUNDPOS
+         compute-available-pos
+         compute-apple-position
+         check-position-out
          increment-pos
          decrement-pos
-         check-position-out
-         compute-available-pos
-         update-positions
          direction-by-posn
-         compute-apple-position)
+         update-positions)
 
 
 ;;;;;;;;;;;;;;;;;;;; DATA TYPES ;;;;;;;;;;;;;;;;;;;;
+
 ; a List<Posn> is one of:
 ;  - '()
 ;  - (cons Posn List<Posn>)
@@ -26,10 +26,11 @@
 
 ; Snake struct and one example
 (define-struct snake [position length direction])
-(define SNAKE1 (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 RIGHT))
+(define SNAKE (make-snake (list (make-posn 13 13) (make-posn 38 13) (make-posn 63 13)) 3 RIGHT))
 
 
 ;;;;;;;;;;;;;;;;;;;; FUNCTIONS ;;;;;;;;;;;;;;;;;;;;
+
 ;;;;;;;;;; MAKE POSITIONS ;;;;;;;;;;
 ; make-positions: Number Number Number List<Posn> -> List<Posn>
 ; computes all the positions on the background before the game starts
@@ -64,72 +65,6 @@
 
 ; All the positions on the background
 (define BACKGROUNDPOS (make-positions 1 1 1 (list (make-posn 13 13))))
-
-
-;;;;;;;;;; INCREMENT POSN ;;;;;;;;;;
-; increment-pos: Number -> Number
-; increments the x or the y position of a posn
-; Header (define (increments-pos xy) 38)
-
-; Examples
-(check-expect (increment-pos 13) 38)
-(check-expect (increment-pos 138) 163)
-(check-expect (increment-pos 563) 588)
-(check-expect (increment-pos 613) 638)
-(check-expect (increment-pos 188) 213)
-
-; Code
-(define (increment-pos xy)
-  (+ xy 25))
-
-
-;;;;;;;;;; DECREMENT POSN ;;;;;;;;;;
-; decrement-pos: Number -> Number
-; decrements the x or the y position of a posn
-; Header (define (decrements-pos xy) 38)
-
-; Examples
-(check-expect (decrement-pos 413) 388)
-(check-expect (decrement-pos 88) 63)
-(check-expect (decrement-pos 588) 563)
-(check-expect (decrement-pos 763) 738)
-(check-expect (decrement-pos 38) 13)
-
-; Code
-(define (decrement-pos xy)
-  (- xy 25))
-
-
-;;;;;;;;;; CHECK POSITION OUT ;;;;;;;;;;
-; check-position-out: Posn List<Posn> -> Boolean
-; checks wheather the given posn is into backgroundpos
-; Header (define (check-position-out pos lop) #false)
-
-; Examples
-(check-expect (check-position-out (make-posn 363 88) BACKGROUNDPOS) #false)
-(check-expect (check-position-out (make-posn 463 63) BACKGROUNDPOS) #false)
-; the left limit
-(check-expect (check-position-out (make-posn 13 13) BACKGROUNDPOS) #false)
-(check-expect (check-position-out (make-posn -12 13) BACKGROUNDPOS) #true)
-; the right limit
-(check-expect (check-position-out (make-posn 488 13) BACKGROUNDPOS) #false)
-(check-expect (check-position-out (make-posn 513 13) BACKGROUNDPOS) #true)
-; the top limit
-(check-expect (check-position-out (make-posn 13 13) BACKGROUNDPOS) #false)
-(check-expect (check-position-out (make-posn 13 -12) BACKGROUNDPOS) #true)
-; the bottom limit
-(check-expect (check-position-out (make-posn 13 488) BACKGROUNDPOS) #false)
-(check-expect (check-position-out (make-posn 13 513) BACKGROUNDPOS) #true)
-
-; Code
-(define (check-position-out pos lop)
-  (cond
-    [(empty? (rest lop))
-     (cond
-       [(equal? pos (first lop)) #false]         ; check if pos is equal to the first element of the list
-       [else #true])]
-    [(equal? pos (first lop)) #false]            ; if the pos is eqaul to the first element of the lop return false
-    [else (check-position-out pos (rest lop))])) ; owhtewise, go ahead
 
 
 ;;;;;;;;;; DELETE ELEMENT ;;;;;;;;;;
@@ -180,11 +115,11 @@
 ; Header (define (compute-apple-position n acc lop) (make-posn 13 13))
 
 ; Examples
-(check-expect (compute-apple-position 1 1 (compute-available-pos (cons (make-posn 488 488) (snake-position SNAKE1)) BACKGROUNDPOS)) (make-posn 463 488))
-(check-expect (compute-apple-position 100 1 (compute-available-pos (cons (make-posn 488 363) (snake-position SNAKE1)) BACKGROUNDPOS)) (make-posn 13 388))
-(check-expect (compute-apple-position 250 1 (compute-available-pos (cons (make-posn 238 188) (snake-position SNAKE1)) BACKGROUNDPOS)) (make-posn 263 188))
-(check-expect (compute-apple-position 364 1 (compute-available-pos (cons (make-posn 388 38) (snake-position SNAKE1)) BACKGROUNDPOS)) (make-posn 413 38))
-(check-expect (compute-apple-position 396 1 (compute-available-pos (cons (make-posn 88 13) (snake-position SNAKE1)) BACKGROUNDPOS)) (make-posn 113 13))
+(check-expect (compute-apple-position 1 1 (compute-available-pos (cons (make-posn 488 488) (snake-position SNAKE)) BACKGROUNDPOS)) (make-posn 463 488))
+(check-expect (compute-apple-position 100 1 (compute-available-pos (cons (make-posn 488 363) (snake-position SNAKE)) BACKGROUNDPOS)) (make-posn 13 388))
+(check-expect (compute-apple-position 250 1 (compute-available-pos (cons (make-posn 238 188) (snake-position SNAKE)) BACKGROUNDPOS)) (make-posn 263 188))
+(check-expect (compute-apple-position 364 1 (compute-available-pos (cons (make-posn 388 38) (snake-position SNAKE)) BACKGROUNDPOS)) (make-posn 413 38))
+(check-expect (compute-apple-position 396 1 (compute-available-pos (cons (make-posn 88 13) (snake-position SNAKE)) BACKGROUNDPOS)) (make-posn 113 13))
 
 ; Code
 (define (compute-apple-position n acc lop)
@@ -192,6 +127,72 @@
     [(or (empty? (rest lop)) (= n acc)) (first lop)]    ; case limit where n is equal to the accumulator and there are not other possible free positions
     [else
      (compute-apple-position n (+ acc 1) (rest lop))])) ; create an apple's position
+
+
+;;;;;;;;;; CHECK POSITION OUT ;;;;;;;;;;
+; check-position-out: Posn List<Posn> -> Boolean
+; checks wheather the given posn is into backgroundpos
+; Header (define (check-position-out pos lop) #false)
+
+; Examples
+(check-expect (check-position-out (make-posn 363 88) BACKGROUNDPOS) #false)
+(check-expect (check-position-out (make-posn 463 63) BACKGROUNDPOS) #false)
+; the left limit
+(check-expect (check-position-out (make-posn 13 13) BACKGROUNDPOS) #false)
+(check-expect (check-position-out (make-posn -12 13) BACKGROUNDPOS) #true)
+; the right limit
+(check-expect (check-position-out (make-posn 488 13) BACKGROUNDPOS) #false)
+(check-expect (check-position-out (make-posn 513 13) BACKGROUNDPOS) #true)
+; the top limit
+(check-expect (check-position-out (make-posn 13 13) BACKGROUNDPOS) #false)
+(check-expect (check-position-out (make-posn 13 -12) BACKGROUNDPOS) #true)
+; the bottom limit
+(check-expect (check-position-out (make-posn 13 488) BACKGROUNDPOS) #false)
+(check-expect (check-position-out (make-posn 13 513) BACKGROUNDPOS) #true)
+
+; Code
+(define (check-position-out pos lop)
+  (cond
+    [(empty? (rest lop))
+     (cond
+       [(equal? pos (first lop)) #false]         ; check if pos is equal to the first element of the list
+       [else #true])]
+    [(equal? pos (first lop)) #false]            ; if the pos is eqaul to the first element of the lop return false
+    [else (check-position-out pos (rest lop))])) ; owhtewise, go ahead
+
+
+;;;;;;;;;; INCREMENT POSN ;;;;;;;;;;
+; increment-pos: Number -> Number
+; increments the x or the y position of a posn
+; Header (define (increments-pos xy) 38)
+
+; Examples
+(check-expect (increment-pos 13) 38)
+(check-expect (increment-pos 138) 163)
+(check-expect (increment-pos 563) 588)
+(check-expect (increment-pos 613) 638)
+(check-expect (increment-pos 188) 213)
+
+; Code
+(define (increment-pos xy)
+  (+ xy 25))
+
+
+;;;;;;;;;; DECREMENT POSN ;;;;;;;;;;
+; decrement-pos: Number -> Number
+; decrements the x or the y position of a posn
+; Header (define (decrements-pos xy) 38)
+
+; Examples
+(check-expect (decrement-pos 413) 388)
+(check-expect (decrement-pos 88) 63)
+(check-expect (decrement-pos 588) 563)
+(check-expect (decrement-pos 763) 738)
+(check-expect (decrement-pos 38) 13)
+
+; Code
+(define (decrement-pos xy)
+  (- xy 25))
 
 
 ;;;;;;;;;; COMPUTE DIRECTIONS ;;;;;;;;;;

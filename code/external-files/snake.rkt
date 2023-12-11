@@ -7,23 +7,25 @@
 (require "positions.rkt")
 (require "generals.rkt")
 
-(provide TAIL
-         SNAKEUNIT
-         SNAKEHEAD
-         SNAKE1
-         make-snake
+(provide make-snake
          snake-position
          snake-length
          snake-direction
-         move-snake
-         change-snake-direction
+         SNAKE
+         SNAKEUNIT
+         SNAKEHEAD
+         TAIL
          draw-snake
-         check-eat-snake)
+         check-eat-snake
+         change-snake-direction
+         move-snake)
+
 
 ;;;;;;;;;;;;;;;;;;;; CONSTANTS ;;;;;;;;;;;;;;;;;;;;
+
 ; Snake struct and one examples
 (define-struct snake [position length direction] #:transparent)
-(define SNAKE1 (make-snake (list (make-posn 188 238) (make-posn 213 238) (make-posn 238 238)) 3 RIGHT))
+(define SNAKE (make-snake (list (make-posn 188 238) (make-posn 213 238) (make-posn 238 238)) 3 RIGHT))
 
 ; SnakeUnit
 (define SNAKEUNIT (rectangle 24 24 "solid" 'green)) ; (bitmap "../resources/SNAKEUNIT.png")
@@ -31,12 +33,16 @@
 ; Elements to draw the SnakeHead
 ; eye
 (define EYE (circle 3 'solid 'black))
+
 ; tongue
 (define TONGUE (rectangle 10 3 'solid 'red))
+
 ; head
 (define HEAD (put-image SNAKEUNIT 0 12 (circle 12 'solid 'green)))
+
 ;snake head
 (define SNAKEHEAD (place-image EYE 10 8 (place-image EYE 10 16 (place-image TONGUE 20 12 HEAD))))
+
 ; tail
 (define TAIL (put-image SNAKEUNIT 24 12 (circle 12 'solid 'green)))
 
@@ -45,6 +51,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;; DATA TYPES ;;;;;;;;;;;;;;;;;;;;
+
 ; a SnakeUnit is an Image
 ; It represents the little rectangles that the snake is made off
 
@@ -67,7 +74,6 @@
 
 
 ;;;;;;;;;;;;;;;;;;;; FUNCTIONS ;;;;;;;;;;;;;;;;;;;;
-
 
 ;;;;;;;;;; ROTATE ELEMENT ;;;;;;;;;;
 ; rotate-el: Direction Image -> Image
@@ -99,7 +105,7 @@
 ; Header (define (draw-snake snake) (place-image TAIL 413 113 (place-image SNAKEUNIT 388 113 (place-image SNAKEHEAD 363 113 BACKGROUND))))
 
 ; Examples
-(check-expect (draw-snake SNAKE1) (place-image SNAKEHEAD 238 238 (place-image SNAKEUNIT 213 238 (place-image TAIL 188 238 BACKGROUND))))
+(check-expect (draw-snake SNAKE) (place-image SNAKEHEAD 238 238 (place-image SNAKEUNIT 213 238 (place-image TAIL 188 238 BACKGROUND))))
 
 (check-expect (draw-snake (make-snake (list (make-posn 363 113) (make-posn 388 113) (make-posn 413 113)) 3 RIGHT))
               (place-image TAIL 363 113 (place-image SNAKEUNIT 388 113 (place-image SNAKEHEAD 413 113 BACKGROUND))))
@@ -138,26 +144,49 @@
        (make-snake (rest (snake-position snake)) (snake-length snake) (snake-direction snake))))]))       ; 
 
 
+;;;;;;;;;; CHECK SNAKE HIT ITSELF ;;;;;;;;;;
+; check-eat-snake : AppState -> AppState
+; check if the snake hit itself during the game
+; Header (define (check-eat-snake state) #true)
+
+; Examples
+(check-expect (check-eat-snake SNAKE) #false)
+(check-expect (check-eat-snake (make-snake(list (make-posn 463 63) (make-posn 438 63) (make-posn 438 38) (make-posn 463 38) (make-posn 463 63)) 5 DOWN)) #true)
+(check-expect (check-eat-snake (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 438 38) (make-posn 463 38) (make-posn 463 13)) 5 UP)) #false)
+(check-expect (check-eat-snake (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63) (make-posn 413 88) (make-posn 438 88) (make-posn 438 63)) 6 UP)) #true)
+(check-expect (check-eat-snake (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63) (make-posn 388 63) (make-posn 363 63)) 5 LEFT)) #false)
+
+; Code
+(define (check-eat-snake snake)
+  (cond
+    [(empty? (rest (snake-position snake))) #false]                                 ; if the snake is finished it means that it has not eaten itself
+    [(equal? (last (snake-position snake)) (first (snake-position snake))) #true]   ; if the snake hits its tail, it's game over
+    [else (check-eat-snake                                                          ; otherwise use the recursive call to check if it hits a part of its body, where the snake is made up of :
+           (make-snake (rest (snake-position snake))                                ; the rest of the body
+                       (snake-length snake)                                         ; the snake's length is the same
+                       (snake-direction snake)))]))                                 ; the snake's direction is the same
+
+
 ;;;;;;;;;; CHANGE SNAKE DIRECTION ;;;;;;;;;;
 ; change-snake-direction: String Snake -> Snake
 ; changes snake's head direction
 ; Header (define (change-snake-direction direction snake) (make-snake (list (make-posn 13 13) (make-posn 13 63) (make-posn 13 88)) 3 LEFT))
 
 ; Examples
-(check-expect (change-snake-direction UP SNAKE1) (make-snake (snake-position SNAKE1)
-                                                             (snake-length SNAKE1)
+(check-expect (change-snake-direction UP SNAKE) (make-snake (snake-position SNAKE)
+                                                             (snake-length SNAKE)
                                                              UP))
-(check-expect (change-snake-direction RIGHT SNAKE1) (make-snake (snake-position SNAKE1)
-                                                                (snake-length SNAKE1)
+(check-expect (change-snake-direction RIGHT SNAKE) (make-snake (snake-position SNAKE)
+                                                                (snake-length SNAKE)
                                                                 RIGHT))
-(check-expect (change-snake-direction DOWN SNAKE1) (make-snake (snake-position SNAKE1)
-                                                               (snake-length SNAKE1)
+(check-expect (change-snake-direction DOWN SNAKE) (make-snake (snake-position SNAKE)
+                                                               (snake-length SNAKE)
                                                                DOWN))
 (check-expect (change-snake-direction LEFT (make-snake (list (make-posn 13 13) (make-posn 13 63) (make-posn 13 88)) 3 DOWN))
               (make-snake (list (make-posn 13 13) (make-posn 13 63) (make-posn 13 88))
                           3
                           LEFT))
-(check-expect (change-snake-direction " " SNAKE1) SNAKE1)
+(check-expect (change-snake-direction " " SNAKE) SNAKE)
 
 ; Code 
 (define (change-snake-direction direction snake)
@@ -178,9 +207,9 @@
 ; Header (define (move-snake d lop) lop)
 
 ; Examples
-(check-expect (move-snake (make-snake (snake-position SNAKE1)
-                                      (snake-length SNAKE1)
-                                      (snake-direction SNAKE1)))
+(check-expect (move-snake (make-snake (snake-position SNAKE)
+                                      (snake-length SNAKE)
+                                      (snake-direction SNAKE)))
               (make-snake (list (make-posn 213 238) (make-posn 238 238) (make-posn 263 238)) 3 RIGHT))
 
 (check-expect (move-snake (make-snake (list (make-posn 13 38) (make-posn 13 63) (make-posn 13 88)) 3 DOWN)) 
@@ -201,26 +230,3 @@
    (update-positions (snake-direction snake) (snake-position snake))   ; the snake's position is update in according with the snake's direction
    (snake-length snake)                                                ; the snake's length is the same
    (snake-direction snake)))                                           ; the snake's directions is the same
-
-
-;;;;;;;;;; CHECK SNAKE HIT ITSELF ;;;;;;;;;;
-; check-eat-snake : AppState -> AppState
-; check if the snake hit itself during the game
-; Header (define (check-eat-snake state) #true)
-
-; Examples
-(check-expect (check-eat-snake SNAKE1) #false)
-(check-expect (check-eat-snake (make-snake(list (make-posn 463 63) (make-posn 438 63) (make-posn 438 38) (make-posn 463 38) (make-posn 463 63)) 5 DOWN)) #true)
-(check-expect (check-eat-snake (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 438 38) (make-posn 463 38) (make-posn 463 13)) 5 UP)) #false)
-(check-expect (check-eat-snake (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63) (make-posn 413 88) (make-posn 438 88) (make-posn 438 63)) 6 UP)) #true)
-(check-expect (check-eat-snake (make-snake (list (make-posn 463 63) (make-posn 438 63) (make-posn 413 63) (make-posn 388 63) (make-posn 363 63)) 5 LEFT)) #false)
-
-; Code
-(define (check-eat-snake snake)
-  (cond
-    [(empty? (rest (snake-position snake))) #false]                                 ; if the snake is finished it means that it has not eaten itself
-    [(equal? (last (snake-position snake)) (first (snake-position snake))) #true]   ; if the snake hits its tail, it's game over
-    [else (check-eat-snake                                                          ; otherwise use the recursive call to check if it hits a part of its body, where the snake is made up of :
-           (make-snake (rest (snake-position snake))                                ; the rest of the body
-                       (snake-length snake)                                         ; the snake's length is the same
-                       (snake-direction snake)))]))                                 ; the snake's direction is the same
