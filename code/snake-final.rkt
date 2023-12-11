@@ -47,13 +47,13 @@
 
 ; RATE: Integer
 ; the number of speed levels the snake can have
-(define RATE 5)
+(define RATE 10)
 
 ; intialize-reviews : -> void
 ; reset state variable RATE
 ; modify state: RATE
 (define (initialize-rate)
-  (set! RATE 5))
+  (set! RATE 10))
 
 ;;;;;;;;;;;;;;;;;;;; FUNCTIONS ;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; DRAW APPSTATE ;;;;;;;;;;
@@ -567,7 +567,6 @@
     [to-draw draw-game]         ; draw the home; then snake, apple and score and finally game over on the background
     [on-key handle-keyboard]    ; start the game and then change snake's direction, reset game or quit the game
     [on-tick move FASTSPEED]    ; update snake's position
-    ;[display-mode 'fullscreen] ; the display automatically becomes full screen
     [name "Snake Game"]         ; give a name to the game's display
     [close-on-stop #true]       ; close the window when the application closes
     [stop-when quit]))          ; quit the application
