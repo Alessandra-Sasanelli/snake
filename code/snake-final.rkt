@@ -202,8 +202,6 @@
 ;;;;;;;;;; MOVE ;;;;;;;;;;
 ; move: AppState -> AppState
 ; moves the snake using an auxiliary function
-; write state: TICK (adds one everytime it is called)
-; read state:  RATE 
 ; Header (define (move DEFAULT) DEFAULT)
 
 ; Code
@@ -326,7 +324,6 @@
 ;;;;;;;;;; RESET ;;;;;;;;;;
 ; reset: AppState -> AppState
 ; changes the game in the appstate
-; modify state: RATE
 ; Header (define (reset DEFAULT) DEFAULT)
 
 ; Code
