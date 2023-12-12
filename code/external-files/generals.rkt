@@ -13,7 +13,6 @@
          APPLEUNIT
          EATEN
          DEATH
-         OST
          UP
          RIGHT
          DOWN
@@ -23,8 +22,7 @@
          QUIT-T
          QUIT-F
          last
-         number->image
-         play-ost)
+         number->image)
 
 
 ;;;;;;;;;;;;;;;;;;;; DATA TYPES ;;;;;;;;;;;;;;;;;;;;
@@ -62,10 +60,7 @@
 (define EATEN "../resources/sounds/apple-eaten.mp3")
 
 ; sound when the snake death
-(define DEATH "../resources/sounds/gameover.wav")
-
-; sound of the game
-(define OST "../resources/sounds/ost.mp3")
+(define DEATH "../resources/sounds/game-over.wav")
 
 ; Directions
 (define UP "up")
@@ -148,11 +143,3 @@
     [else
      (beside (bitmap/file (number->path (string->number (string (string-ref str n)))))                          ; recursive case where place the numbers' image next to each other
              (number->image str (add1 n)))]))                                                                   ; calls itself for the next number
-
-
-;;;;;;;;;; PLAY OST ;;;;;;;;;;
-; play-ost: Number -> (void)
-(define (play-ost tick rate path)
-  (cond
-    [(= (remainder tick rate) 0) (play-sound path #true)]
-    [else #true]))

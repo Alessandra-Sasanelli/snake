@@ -49,7 +49,7 @@
 (define TICK 0)
 
 ; speed levels
-(define RATE 10)
+(define RATE 8)
 
 ; GAMEOVRPLAYED: Boolean
 ; represents weather the game-over mp3 has been played or not
@@ -144,8 +144,8 @@
                      QUIT-F 0 0)) #false)
 
 (define (end? state)
-  (if (or (check-position-out (last (snake-position (appstate-snake state))) BACKGROUNDPOS) ; return true if the snake hit the border
-      (check-eat-snake (appstate-snake state)))
+  (if (or (check-position-out (last (snake-position (appstate-snake state))) BACKGROUNDPOS)
+          (check-eat-snake (appstate-snake state)))
       (begin (if (not GAMEOVRPLAYED) (play-sound DEATH #true) #false)
              (begin
                (set! GAMEOVRPLAYED #true) #true))
@@ -179,7 +179,12 @@
                               0
                               0))
               (place-image/align (number->image (number->string (* 100 (- 3 3))) 0) 670 100 'right 'center
-                                 (overlay/align 'center 'center (place-image APPLEUNIT 463 488 (place-image TAIL 363 113 (place-image SNAKEUNIT 388 113 (place-image SNAKEHEAD 413 113 BACKGROUND)))) GAMEBACK)))
+                                 (overlay/align 'center 'center
+                                                (place-image APPLEUNIT 463 488
+                                                             (place-image TAIL 363 113
+                                                                          (place-image SNAKEUNIT 388 113
+                                                                                       (place-image SNAKEHEAD 413 113 BACKGROUND))))
+                                                GAMEBACK)))
 
 (check-expect (draw-appstate (make-appstate
                               (make-snake (list (make-posn 113 113) (make-posn 163 113) (make-posn 138 113) (make-posn 188 113)) 4 RIGHT)
@@ -189,7 +194,13 @@
                               0
                               0))
               (place-image/align (number->image (number->string (* 100 (- 4 3))) 0) 670 100 'right 'center
-                                 (overlay/align 'center 'center (place-image APPLEUNIT 13 388 (place-image TAIL 113 113 (place-image SNAKEUNIT 163 113 (place-image SNAKEUNIT 138 113 (place-image SNAKEHEAD 188 113 BACKGROUND))))) GAMEBACK)))
+                                 (overlay/align 'center 'center
+                                                (place-image APPLEUNIT 13 388
+                                                             (place-image TAIL 113 113
+                                                                          (place-image SNAKEUNIT 163 113
+                                                                                       (place-image SNAKEUNIT 138 113
+                                                                                                    (place-image SNAKEHEAD 188 113 BACKGROUND)))))
+                                                GAMEBACK)))
 
 (check-expect (draw-appstate (make-appstate
                               (make-snake (list (make-posn 263 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 363 88)) 5 RIGHT)
@@ -199,7 +210,14 @@
                               0
                               0))
               (place-image/align (number->image (number->string (* 100 (- 5 3))) 0) 670 100 'right 'center
-                                 (overlay/align 'center 'center (place-image APPLEUNIT 163 188 (place-image TAIL 263 88 (place-image SNAKEUNIT 338 88 (place-image SNAKEUNIT 313 88 (place-image SNAKEUNIT 288 88 (place-image SNAKEHEAD 363 88 BACKGROUND)))))) GAMEBACK)))
+                                 (overlay/align 'center 'center
+                                                (place-image APPLEUNIT 163 188
+                                                             (place-image TAIL 263 88
+                                                                          (place-image SNAKEUNIT 338 88
+                                                                                       (place-image SNAKEUNIT 313 88
+                                                                                                    (place-image SNAKEUNIT 288 88
+                                                                                                                 (place-image SNAKEHEAD 363 88 BACKGROUND))))))
+                                                GAMEBACK)))
 
 (check-expect (draw-appstate (make-appstate
                               (make-snake (list (make-posn 413 63) (make-posn 438 63) (make-posn 463 63)) 3 RIGHT)
@@ -209,7 +227,12 @@
                               0
                               0))
               (place-image/align (number->image (number->string (* 100 (- 3 3))) 0) 670 100 'right 'center
-                                 (overlay/align 'center 'center (place-image APPLEUNIT 313 38 (place-image TAIL 413 63 (place-image SNAKEUNIT 438 63 (place-image SNAKEHEAD 463 63 BACKGROUND)))) GAMEBACK)))
+                                 (overlay/align 'center 'center
+                                                (place-image APPLEUNIT 313 38
+                                                             (place-image TAIL 413 63
+                                                                          (place-image SNAKEUNIT 438 63
+                                                                                       (place-image SNAKEHEAD 463 63 BACKGROUND))))
+                                                GAMEBACK)))
 
 (check-expect (draw-appstate (make-appstate
                               SNAKE
@@ -219,7 +242,12 @@
                               0
                               0))
               (place-image/align (number->image (number->string (* 100 (- 3 3))) 0) 670 100 'right 'center
-                                 (overlay/align 'center 'center (place-image APPLEUNIT 13 13 (place-image TAIL 188 238 (place-image SNAKEUNIT 213 238 (place-image SNAKEHEAD 238 238 BACKGROUND)))) GAMEBACK)))
+                                 (overlay/align 'center 'center
+                                                (place-image APPLEUNIT 13 13
+                                                             (place-image TAIL 188 238
+                                                                          (place-image SNAKEUNIT 213 238
+                                                                                       (place-image SNAKEHEAD 238 238 BACKGROUND))))
+                                                GAMEBACK)))
 
 ; Code
 (define (draw-appstate state)                                                             ; draw a image of the appstate with :
@@ -237,7 +265,7 @@
 ;;;;;;;;;; DRAW GAME ;;;;;;;;;;
 ; draw-game: AppState -> Image
 ; decide to draw wheather the home or the game
-; Header (define (draw-game DEFAULT) HOME)
+; Header (define (draw-game state) HOME)
 
 ; Examples
 (check-expect (draw-game DEFAULT) HOME)
@@ -250,7 +278,12 @@
                           0
                           0))
               (place-image/align (number->image (number->string (* 100 (- 3 3))) 0) 670 100 'right 'center
-                                 (overlay/align 'center 'center (place-image APPLEUNIT 463 488 (place-image TAIL 363 113 (place-image SNAKEUNIT 388 113 (place-image SNAKEHEAD 413 113 BACKGROUND)))) GAMEBACK)))
+                                 (overlay/align 'center 'center
+                                                (place-image APPLEUNIT 463 488
+                                                             (place-image TAIL 363 113
+                                                                          (place-image SNAKEUNIT 388 113
+                                                                                       (place-image SNAKEHEAD 413 113 BACKGROUND))))
+                                                GAMEBACK)))
 
 (check-expect (draw-game (make-appstate
                           (make-snake (list (make-posn 113 113) (make-posn 163 113) (make-posn 138 113) (make-posn 188 113)) 4 RIGHT)
@@ -263,13 +296,20 @@
 
 (check-expect (draw-game (make-appstate
                           (make-snake (list (make-posn 263 88) (make-posn 338 88) (make-posn 313 88) (make-posn 288 88) (make-posn 363 88)) 5 RIGHT)
-                          (compute-apple-position 250 1 (compute-available-pos (cons (make-posn 238 188) (snake-position SNAKE)) BACKGROUNDPOS))
+                          (compute-apple-position 250 1(compute-available-pos (cons (make-posn 238 188) (snake-position SNAKE)) BACKGROUNDPOS))
                           GAME-T
                           QUIT-F
                           0
                           0))
               (place-image/align (number->image (number->string (* 100 (- 5 3))) 0) 670 100 'right 'center
-                                 (overlay/align 'center 'center (place-image APPLEUNIT 163 188 (place-image TAIL 263 88 (place-image SNAKEUNIT 338 88 (place-image SNAKEUNIT 313 88 (place-image SNAKEUNIT 288 88 (place-image SNAKEHEAD 363 88 BACKGROUND)))))) GAMEBACK)))
+                                 (overlay/align 'center 'center
+                                                (place-image APPLEUNIT 163 188
+                                                             (place-image TAIL 263 88
+                                                                          (place-image SNAKEUNIT 338 88
+                                                                                       (place-image SNAKEUNIT 313 88
+                                                                                                    (place-image SNAKEUNIT 288 88
+                                                                                                                 (place-image SNAKEHEAD 363 88 BACKGROUND))))))
+                                                GAMEBACK)))
 
 (check-expect (draw-game (make-appstate
                           SNAKE
@@ -300,7 +340,7 @@
                                #true
                                (appstate-quit DEFAULT)
                                0
-                               10))
+                               (appstate-rate DEFAULT)))
 (check-expect (start (make-appstate
                       (make-snake (list (make-posn 313 313) (make-posn 338 313) (make-posn 363 313)) 3 RIGHT)
                       (appstate-apple DEFAULT)
@@ -382,7 +422,7 @@
    #false                                                                                                                               ; the game become false
    #false                                                                                                                               ; the quit become false
    (appstate-tick state)                                                                                                                ; the tick is the same
-   10))                                                                                                                                 ; the rate become ten
+   RATE))                                                                                                                                 ; the rate become ten
 
 
 ;;;;;;;;;; HANDLE KEYBOARD ;;;;;;;;;;
@@ -588,7 +628,7 @@
 
 ; Code
 (define (move state)
-  (cond                                                                                                        ; if the game is off, the snake must not move
+  (cond
     [(end? state) (make-appstate                                                                               ; giving an appstate as before where :
                    (appstate-snake state)                                                                        ; the snaek's state is the same
                    (appstate-apple state)                                                                        ; the apple's state is the same
@@ -596,25 +636,24 @@
                    #false                                                                                        ; the quit is false
                    (appstate-tick state)                                                                         ; the tick's state is the same
                    (appstate-rate state))]                                                                       ; the rate's state is the same
-    [(not (appstate-game state)) state]                                                                        ; 
-    [else (cond
-            [(= (remainder (appstate-tick state) (appstate-rate state)) 0)
-             (cond
-               [(equal? (last (snake-position (appstate-snake state))) (appstate-apple state)) (eating state)] ; if the snake is eating call the function to upgrade both its length and apple's position
-               [else  (make-appstate                                                                           ; every tick the appstate is moved and it creates a new update where it is made by :
-                       (move-snake (appstate-snake state))                                                       ; the new position of the snake
-                       (appstate-apple state)                                                                    ; the apple's state is the same
-                       (appstate-game state)                                                                     ; the game's state is the same
-                       (appstate-quit state)                                                                     ; the quit's state is the same
-                       (add1 (appstate-tick state))                                                              ; the tick's state is greater than one
-                       (appstate-rate state))])]                                                                 ; the rate's state is the same
-            [else (make-appstate                                                                               ; otherwise give the same appstate as before but add 1 to tick
-                   (appstate-snake state)
-                   (appstate-apple state)
-                   (appstate-game state)
-                   (appstate-quit state)
-                   (add1 (appstate-tick state))
-                   (appstate-rate state))])]))
+    [(not (appstate-game state)) state]                                                                        ; if the game is off, the snake must not move
+    [(= (remainder (appstate-tick state) (appstate-rate state)) 0)
+     (cond
+       [(equal? (last (snake-position (appstate-snake state))) (appstate-apple state)) (eating state)] ; if the snake is eating call the function to upgrade both its length and apple's position
+       [else  (make-appstate                                                                           ; every tick the appstate is moved and it creates a new update where it is made by :
+               (move-snake (appstate-snake state))                                                       ; the new position of the snake
+               (appstate-apple state)                                                                    ; the apple's state is the same
+               (appstate-game state)                                                                     ; the game's state is the same
+               (appstate-quit state)                                                                     ; the quit's state is the same
+               (add1 (appstate-tick state))                                                              ; the tick's state is greater than one
+               (appstate-rate state))])]                                                                 ; the rate's state is the same
+    [else (make-appstate                                                                               ; otherwise give the same appstate as before but add 1 to tick
+           (appstate-snake state)
+           (appstate-apple state)
+           (appstate-game state)
+           (appstate-quit state)
+           (add1 (appstate-tick state))
+           (appstate-rate state))]))
 
 
 ;;;;;;;;;; QUIT ;;;;;;;;;;
@@ -640,3 +679,5 @@
     [name "Snake Game"]         ; give a name to the game's display
     [close-on-stop #true]       ; close the window when the application closes
     [stop-when quit]))          ; quit the application
+
+(snake-game DEFAULT)
