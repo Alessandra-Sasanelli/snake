@@ -153,11 +153,8 @@
 ; Code
 (define (check-position-out pos lop)
   (cond
-    [(empty? (rest lop))
-     (cond
-       [(equal? pos (first lop)) #false]         ; check if pos is equal to the first element of the list
-       [else #true])]
-    [(equal? pos (first lop)) #false]            ; if the pos is eqaul to the first element of the lop return false
+    [(empty? lop) #true]
+    [(equal? pos (first lop)) #false]            ; if the pos is equal to the first element of the lop return false
     [else (check-position-out pos (rest lop))])) ; owhtewise, go ahead
 
 
@@ -255,4 +252,6 @@
   (cond
     [(empty? (rest lop)) (cons (compute-new-posn (first lop) d) '())]                                                      ; base case where the list is over create a new position
     [else
-     (cons (compute-new-posn (first lop) (direction-by-posn (first lop) (second lop))) (update-positions d (rest lop)))])) ; recursive case with new position for first element and pass the rest of the snake
+     (cons
+      (compute-new-posn (first lop) (direction-by-posn (first lop) (second lop)))
+      (update-positions d (rest lop)))]))                                                  ; recursive case with new position for first element and pass the rest of the snake
