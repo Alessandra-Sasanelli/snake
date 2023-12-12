@@ -41,6 +41,8 @@
 ; - #false   : the game is on and is running
 ; - #true    : the game is off and "close"
 
+; a StringOfNumbers is a String which only characters inside can be numeric (no other characters allowed)
+
 ; define the game's background
 (define BACKGROUND (bitmap "../../resources/images/snake-background.png"))
 
@@ -129,7 +131,7 @@
 
 
 ;;;;;;;;;; FROM STRING TO IMAGE ;;;;;;;;;;
-; string->image: String<Number> Number -> Image
+; number->image: StringOfNumbers Number -> Image
 ; takes in a number and returns it as an image
 ; Header (define (number->image str n) )
 
