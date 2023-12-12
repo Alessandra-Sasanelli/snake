@@ -562,8 +562,6 @@
 ; Code
 (define (handle-keyboard state key)
   (cond    
-    [(not (string? key)) state]                                                                          ; for any possible not-string key input, the output is the same AppState as before
-    
     [(string=? key "s") (start state)]                                                                   ; start the game
     
     [(or (and (string=? key "up") (string=? (snake-direction (appstate-snake state)) "down"))            ; if the direction is opposite of the key, the state is the same
