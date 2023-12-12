@@ -147,8 +147,7 @@
   (if (or (check-position-out (last (snake-position (appstate-snake state))) BACKGROUNDPOS)
           (check-eat-snake (appstate-snake state)))
       (begin (if (not GAMEOVRPLAYED) (play-sound DEATH #true) #false)
-             (begin
-               (set! GAMEOVRPLAYED #true) #true))
+               (set! GAMEOVRPLAYED #true) #true)
       (begin (reset-gameover) #false)))
 
 
@@ -620,8 +619,6 @@
 ;;;;;;;;;; MOVE ;;;;;;;;;;
 ; move: AppState -> AppState
 ; moves the snake using an auxiliary function
-; write state: TICK (adds one everytime it is called)
-; read state:  RATE 
 ; Header (define (move state) DEFAULT)
 
 ; Code
