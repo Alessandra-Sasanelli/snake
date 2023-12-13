@@ -19,7 +19,7 @@
 	The folder of the main project contains 3 subdirectories: 
 	\begin{itemize}
 		\item docs is meant to hold all of the non-relevant to code files, like the README.txt, the proposal and the two guides
-		\item resources is used to hold all of the images and sounds used by the game: into the images folder there are all of the images; into the sounds folder there are all of the sounds, whilst in the numbers folder, there are the images of the numbers (used to track the user score)
+		\item resources is used to hold all of the images and sounds used by the game
 		\item code holds all of the source files for the project; inside, the subdirectory external-files has all of the auxiliary code files
 	\end{itemize}
 	
@@ -37,15 +37,13 @@
 	\pagebreak
 	
 	\section{Source code}
-	This section will discuss the main functions developed to make the application. It will focus on every single file to explain the functions present in each of them.
-	
 	\subsection{positions.rkt}
-	This file contains all the functions relative to the positions; below, are listed and explained a few of them.
-	Here won't be listed all simple auxiliary functions, which are: increment-pos, decrement-pos, direction-by-posn, delete-el.
+	This file contains all the functions relative to the positions.
+	Here won't be listed: increment-pos, decrement-pos, direction-by-posn, delete-el.
 	\begin{itemize}
 		\item \textbf{make-positions}: \\
 			\emph{signature}: Number Number Number List$<$Posn$>$ -$>$ List$<$Posn$>$ \\
-			\emph{purpose}: computes all the positions on the background before the game starts \\
+			\emph{purpose}: computes all the positions on the background \\
 			\emph{explanation}: this function has four parameters: `n` (the starting position count), `x` and `y` (initial row and column), and a list of existing positions. To map positions on a 501x501 pixel background, where each position spans 25x25 pixels, use parameters 1, 1, 1, and `(list (make-posn 13 13))`. The recursion halts at `n = 400`, the maximum positions possible on this background, marking the base case. If a row is filled, increase `n` and `y` to move to the next row. Otherwise, increment `n` and `x` for the next column. Each position, determined by row and column, is added to the positions list.
 			\begin{figure}[h!]
 				\centering
@@ -53,20 +51,10 @@
 				\caption{make-position function in racket}
 			\end{figure}
 			
-		\item \textbf{compute-available-pos}: \\
-			\emph{signature}: List$<$Posn$>$ List$<$Posn$>$ -$>$ List$<$Posn$>$ \\
-			\emph{purpose}: computes available positions on the background \\
-			\emph{explanation}: this function performs recursion over two lists: `lop-snake`, which holds positions of the snake to be removed from the available positions in `lop`. The base case occurs when either or both lists are empty, indicating all positions have been evaluated and are unoccupied, so `lop` is returned. Otherwise, the function recursively processes the remainder of `lop-snake` and applies `delete-el` to the first element of `lop-snake` and the `lop` list. The `delete-el` function either retains `lop` as is or removes an element from it if it matches the first element of `lop-snake`.
-			\begin{figure}[h!]
-				\centering
-				\includegraphics[width=.6\linewidth]{compute-available-pos.png}
-				\caption{compute-available-pos function in racket}
-			\end{figure}
-			
 		\item \textbf{compute-apple-position}: \\
 			\emph{signature}: Number Number List$<$Posn$>$ -$>$ Apple \\
 			\emph{purpose}: computes all the positions on the background before the game starts \\
-			\emph{explanation}: this function has three parameters, including an accumulator. It selects a position from available positions using `n`, which ranges from 1 (inclusive) to 401 (exclusive). The base case triggers if the list is empty or `n` equals the accumulator, returning the first element. Otherwise, it recurses over the rest of the list, incrementing the accumulator by one.
+			\emph{explanation}: this function has three parameters, including an accumulator. It selects a position from available positions (passed using compute-available-pos, which deletes all the occupied positions on the background by the snake or the last apple position) using `n`, which ranges from 1 (inclusive) to 401 (exclusive). The base case triggers if the list is empty or `n` equals the accumulator, returning the first element. Otherwise, it recurses over the rest of the list, incrementing the accumulator by one.
 			\begin{figure}[h!]
 				\centering
 				\includegraphics[width=.6\linewidth]{compute-apple-position.png}
@@ -99,7 +87,8 @@
 	\pagebreak
 	
 	\subsection{snake.rkt}
-	This file contains all the functions relative to the snake. Of all the functions written, it is only shown the main one, the draw-snake. The others are: change-snake-direction, which simply returns a snake with changed direction based on the direction inputed, move-snake which return a snake but calling the update-positions on the snake-position, check-eat-snake which simply returns true if the position of the head is equal to any other into the snake-position.
+	This file contains all the functions relative to the snake. 
+	Here won't be listed: change-snake-direction, move-snake and check-eat-snake.
 	\begin{itemize}
 		\item \textbf{draw-snake}: \\
 			\emph{signature}: Snake -$>$ Image \\
@@ -113,7 +102,8 @@
 	\end{itemize}
 	
 	\subsection{generals.rkt}
-	This file contains all the functions that are of general purpose. This file mainly provides constants, but it also provides two functions, one of which will be explained here. One important constant is the NUMBERS, which is a list containing the paths to the images of the single numbers.
+	This file contains all the functions that are of general purpose. 
+	This file mainly provides constants, but it also provides two functions, one of which will be explained here. One important constant is the NUMBERS, which is a list containing the paths to the images of the single numbers.
 	\begin{itemize}
 		\item \textbf{number-$>$image}: \\
 			\emph{signature}: StringOfNumbers Number -$>$ Image \\
@@ -129,7 +119,8 @@
 	\pagebreak
 	
 	\subsection{snake-final.rkt}
-	This file contains all the functions that are needed to make the big-bang work. Most of these functions take in an Appstate.
+	This file contains all the functions that are needed to make the big-bang work. 
+	Most of these functions take in an Appstate.
 	\begin{itemize}
 		\item \textbf{handle-keyboard}: \\
 			\emph{signature}: AppState KeyboardEvent -$>$ AppState \\
