@@ -26,6 +26,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;; DATA TYPES ;;;;;;;;;;;;;;;;;;;;
+
 ; a Direction is one of these String
 ; - "up"
 ; - "left"
@@ -133,7 +134,7 @@
 ;;;;;;;;;; FROM STRING TO IMAGE ;;;;;;;;;;
 ; number->image: StringOfNumbers Number -> Image
 ; takes in a number and returns it as an image
-; Header (define (number->image str n) )
+; Header (define (number->image str n) imame)
 
 ; Examples
 ; we cannot give examples because this function is called from the snake_final file which has a different path to find the number than the generals file
@@ -142,6 +143,5 @@
 (define (number->image str n)
   (cond
     [(= n (- (string-length str) 1)) (bitmap/file (number->path (string->number (string (string-ref str n)))))] ; base case where call the right path for each number
-    [else
-     (beside (bitmap/file (number->path (string->number (string (string-ref str n)))))                          ; recursive case where place the numbers' image next to each other
-             (number->image str (add1 n)))]))                                                                   ; calls itself for the next number
+    [else (beside (bitmap/file (number->path (string->number (string (string-ref str n)))))                     ; recursive case where place the numbers' image next to each other
+                  (number->image str (add1 n)))]))                                                              ; calls itself for the next number

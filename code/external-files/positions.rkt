@@ -46,21 +46,20 @@
 ; Code
 (define (make-positions n x y lop)
   (cond
-    [(= n 400) lop]                                                                         ; if n = 400 returns the list of all possible positions
-    [else                                                                                   ; otherwise create a list of all possible posn
+    [(= n 400) lop]                                                                              ; if n = 400 returns the list of all possible positions
+    [else                                                                                        ; otherwise create a list of all possible posn
      (cond
-       [(= (posn-x (first lop)) 488)                                                        ; if the x posn is equal to 488
-        (make-positions                                                                     ; call the recursive where the inputs are:
-         (+ n 1)                                                                              ; n increased by one
-         1                                                                                    ; the new x is one
-         (+ y 1)                                                                              ; y increased by one
-         (cons (make-posn 13 (+ (* 12 (+ (* y 2) 1)) (+ y 1))) lop))]                         ; new lop with new posn
-       [else
-        (make-positions                                                                     ; otherwise call the recursive where the inputs are:
-         (+ n 1)                                                                              ; n increased by one
-         (+ x 1)                                                                              ; x increased by one
-         y                                                                                    ; the y is the same
-         (cons (make-posn (+ (* 12 (+ (* x 2) 1)) (+ x 1)) (posn-y (first lop))) lop))])]))   ; new lop wih new posn
+       [(= (posn-x (first lop)) 488)
+        (make-positions                                                                          ; if the x posn is eqaul to 488call the recursive where the inputs are:
+         (+ n 1)                                                                                   ; n increased by one
+         1                                                                                         ; the new x is one
+         (+ y 1)                                                                                   ; y increased by one
+         (cons (make-posn 13 (+ (* 12 (+ (* y 2) 1)) (+ y 1))) lop))]                              ; new lop with new posn
+       [else (make-positions                                                                     ; otherwise call the recursive where the inputs are:
+              (+ n 1)                                                                              ; n increased by one
+              (+ x 1)                                                                              ; x increased by one
+              y                                                                                    ; the y is the same
+              (cons (make-posn (+ (* 12 (+ (* x 2) 1)) (+ x 1)) (posn-y (first lop))) lop))])]))   ; new lop wih new posn
 
 
 ; All the positions on the background
@@ -103,10 +102,9 @@
 (define (compute-available-pos lop-snake lop)
   (cond
     [(or (empty? lop) (empty? lop-snake)) lop] ; base case where the all the available positions are checked
-    [else
-     (compute-available-pos
-      (rest lop-snake)
-      (delete-el (first lop-snake) lop))]))    ; recursive case to call a function to delete the occupied position
+    [else (compute-available-pos
+           (rest lop-snake)
+           (delete-el (first lop-snake) lop))]))    ; recursive case to call a function to delete the occupied position
 
 
 ;;;;;;;;;; COMPUTE APPLE POSITIONS ;;;;;;;;;;
@@ -124,9 +122,8 @@
 ; Code
 (define (compute-apple-position n acc lop)
   (cond
-    [(or (empty? (rest lop)) (= n acc)) (first lop)]    ; case limit where n is equal to the accumulator and there are not other possible free positions
-    [else
-     (compute-apple-position n (+ acc 1) (rest lop))])) ; create an apple's position
+    [(or (empty? (rest lop)) (= n acc)) (first lop)]         ; case limit where n is equal to the accumulator and there are not other possible free positions
+    [else (compute-apple-position n (+ acc 1) (rest lop))])) ; create an apple's position
 
 
 ;;;;;;;;;; CHECK POSITION OUT ;;;;;;;;;;
@@ -250,8 +247,7 @@
 ; Code
 (define (update-positions d lop)
   (cond
-    [(empty? (rest lop)) (cons (compute-new-posn (first lop) d) '())]                                                      ; base case where the list is over create a new position
-    [else
-     (cons
-      (compute-new-posn (first lop) (direction-by-posn (first lop) (second lop)))
-      (update-positions d (rest lop)))]))                                                  ; recursive case with new position for first element and pass the rest of the snake
+    [(empty? (rest lop)) (cons (compute-new-posn (first lop) d) '())]                  ; base case where the list is over create a new position
+    [else (cons
+           (compute-new-posn (first lop) (direction-by-posn (first lop) (second lop)))
+           (update-positions d (rest lop)))]))                                         ; recursive case with new position for first element and pass the rest of the snake

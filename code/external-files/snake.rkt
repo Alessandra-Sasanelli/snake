@@ -28,7 +28,7 @@
 (define SNAKE (make-snake (list (make-posn 188 238) (make-posn 213 238) (make-posn 238 238)) 3 RIGHT))
 
 ; SnakeUnit
-(define SNAKEUNIT (rectangle 24 24 "solid" 'green)) ; (bitmap "../resources/SNAKEUNIT.png")
+(define SNAKEUNIT (rectangle 24 24 "solid" 'green))
 
 ; Elements to draw the SnakeHead
 ; eye
@@ -122,26 +122,25 @@
 ; Code
 (define (draw-snake snake)
   (cond                                                                                                   ; 
-    [(empty? (rest (snake-position snake)))                                                               ; 
+    [(empty? (rest (snake-position snake)))
      (place-image                                                                                         ; 
       (rotate-el (snake-direction snake) SNAKEHEAD)                                                       ; 
       (posn-x (first (snake-position snake)))                                                             ; 
       (posn-y (first (snake-position snake)))                                                             ; 
       BACKGROUND)]                                                                                        ; 
-    [(equal? (length (snake-position snake)) (snake-length snake))                                        ; 
+    [(equal? (length (snake-position snake)) (snake-length snake))
      (place-image                                                                                         ; 
       (rotate-el (direction-by-posn (first (snake-position snake)) (second (snake-position snake))) TAIL) ; 
       (posn-x (first (snake-position snake)))                                                             ; 
       (posn-y (first (snake-position snake)))                                                             ; 
       (draw-snake                                                                                         ; 
        (make-snake (rest (snake-position snake)) (snake-length snake) (snake-direction snake))))]         ; 
-    [else                                                                                                 ; 
-     (place-image                                                                                         ; 
-      SNAKEUNIT                                                                                           ; 
-      (posn-x (first (snake-position snake)))                                                             ; 
-      (posn-y (first (snake-position snake)))                                                             ; 
-      (draw-snake                                                                                         ; 
-       (make-snake (rest (snake-position snake)) (snake-length snake) (snake-direction snake))))]))       ; 
+    [else (place-image                                                                                         ; 
+           SNAKEUNIT                                                                                           ; 
+           (posn-x (first (snake-position snake)))                                                             ; 
+           (posn-y (first (snake-position snake)))                                                             ; 
+           (draw-snake                                                                                         ; 
+            (make-snake (rest (snake-position snake)) (snake-length snake) (snake-direction snake))))]))       ; 
 
 
 ;;;;;;;;;; CHECK SNAKE HIT ITSELF ;;;;;;;;;;
@@ -174,14 +173,14 @@
 
 ; Examples
 (check-expect (change-snake-direction UP SNAKE) (make-snake (snake-position SNAKE)
-                                                             (snake-length SNAKE)
-                                                             UP))
+                                                            (snake-length SNAKE)
+                                                            UP))
 (check-expect (change-snake-direction RIGHT SNAKE) (make-snake (snake-position SNAKE)
-                                                                (snake-length SNAKE)
-                                                                RIGHT))
-(check-expect (change-snake-direction DOWN SNAKE) (make-snake (snake-position SNAKE)
                                                                (snake-length SNAKE)
-                                                               DOWN))
+                                                               RIGHT))
+(check-expect (change-snake-direction DOWN SNAKE) (make-snake (snake-position SNAKE)
+                                                              (snake-length SNAKE)
+                                                              DOWN))
 (check-expect (change-snake-direction LEFT (make-snake (list (make-posn 13 13) (make-posn 13 63) (make-posn 13 88)) 3 DOWN))
               (make-snake (list (make-posn 13 13) (make-posn 13 63) (make-posn 13 88))
                           3

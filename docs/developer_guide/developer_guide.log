@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.9.21)  12 DEC 2023 20:11
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.9.20)  12 DEC 2023 22:13
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -365,19 +365,19 @@ File: move.png Graphic file (type png)
 Package pdftex.def Info: move.png  used on input line 161.
 (pdftex.def)             Requested size: 300.29344pt x 172.21977pt.
  [5 <./handle-keyboard.png> <./eating.png>]
-<end?.png, id=96, 733.74126pt x 134.5025pt>
-File: end?.png Graphic file (type png)
-<use end?.png>
-Package pdftex.def Info: end?.png  used on input line 171.
+<end.png, id=96, 733.74126pt x 134.5025pt>
+File: end.png Graphic file (type png)
+<use end.png>
+Package pdftex.def Info: end.png  used on input line 171.
 (pdftex.def)             Requested size: 300.29344pt x 55.04785pt.
- [6 <./move.png> <./end?.png>]
+ [6 <./move.png> <./end.png>]
 (./developer_guide.aux)
 Package rerunfilecheck Info: File `developer_guide.out' has not changed.
 (rerunfilecheck)             Checksum: 2FCE7A36D77C8AD641403A4BF301EAA4;880.
  ) 
 Here is how much of TeX's memory you used:
- 8722 strings out of 476025
- 139255 string characters out of 5790017
+ 8721 strings out of 476025
+ 139245 string characters out of 5790017
  1859388 words of memory out of 5000000
  29055 multiletter control sequences out of 15000+600000
  518136 words of font info for 51 fonts, out of 8000000 for 9000

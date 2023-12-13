@@ -41,25 +41,23 @@
 		\item "esc" -$>$ using the esc button you can exit the game and the game window closes.
 	\end{itemize}
 	
-	\noindent\large{\textbf{IMPORTANT:}}\emph{trying to change the snake's direction to the opposite of its movement won't have any effect!.}\\
+	\noindent\textbf{\large{IMPORTANT:}}\emph{\large{trying to change the snake's direction to the opposite of its movement won't have any effect!.}}\\
 	
-	\begin{centering}
-		\centering Below are three examples of what the canvases look like
-	\end{centering}
+	\centerline{Below are three examples of what the canvases look like}
 	
-	\begin{textblock*}{10cm}(0cm,9cm)
+	\begin{textblock*}{10cm}(0cm,8.5cm)
 		\centering
 		\includegraphics[width=.5\linewidth]{home.png}\\
 		\Large{\textbf{Home Page}}
 	\end{textblock*}
 	
-	\begin{textblock*}{10cm}(6cm,9cm)
+	\begin{textblock*}{10cm}(6cm,8.5cm)
 		\centering
 		\includegraphics[width=.5\linewidth]{game.png}\\
 		\Large{\textbf{Game}}
 	\end{textblock*}
 	
-	\begin{textblock*}{10cm}(12cm,9cm)
+	\begin{textblock*}{10cm}(12cm,8.5cm)
 		\centering
 		\includegraphics[width=.5\linewidth]{game-over.png}\\
 		\Large{\textbf{Game Over}}
@@ -67,6 +65,6 @@
 	
 	\vspace{6.5cm}\section{Points}
 	So, the aim of the game is to eat the most apple as possible, but, how do the points work and when does the snake's speed increase? Well, the score functioning is very simple: at the beginning of every game, the number of point is set to 0 by default and every time the snake eats an apple, it scores 100 points. There no limit, except for when there is no more space on the board.\\
-	The speed of the snake does instead work very differently: we divided it into eight levels in order to start with a low speed and to finish with the highest one. However, the gamer is allowed and is encouraged to change and modify these levels of speed! In fact, if he wants to complicate the game by starting with a higher speed he can by modifying a game contant found on line 49 of the "snake-final.rkt " file. The constant to be modified is called RATE, and it can be setted to a positive integer value between 1 and 10. Beware: if the value is higher the snake will be too slow at the beginning.
+	The speed of the snake does instead work very differently: we divided it into eight levels in order to start with a low speed and to finish with the highest one. However, the gamer is allowed and is encouraged to change and modify these levels of speed! In fact, if he wants to complicate the game by starting with a higher speed he can by modifying a game constant found on line 49 of the "snake-final.rkt " file. The constant to be modified is called RATE, and it can be setted to a positive integer value between 1 and 10. Beware: if the value is higher the snake will be too slow at the beginning.
 	
 \end{document}

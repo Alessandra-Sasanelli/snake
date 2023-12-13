@@ -58,6 +58,7 @@
 (define (reset-gameover)
   (set! GAMEOVRPLAYED #false))
 
+
 ;;;;;;;;;;;;;;;;;;;; FUNCTIONS ;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;; END ;;;;;;;;;;
@@ -147,7 +148,7 @@
   (if (or (check-position-out (last (snake-position (appstate-snake state))) BACKGROUNDPOS)
           (check-eat-snake (appstate-snake state)))
       (begin (if (not GAMEOVRPLAYED) (play-sound DEATH #true) #false)
-               (set! GAMEOVRPLAYED #true) #true)
+             (set! GAMEOVRPLAYED #true) #true)
       (begin (reset-gameover) #false)))
 
 
@@ -421,7 +422,7 @@
    #false                                                                                                                               ; the game become false
    #false                                                                                                                               ; the quit become false
    (appstate-tick state)                                                                                                                ; the tick is the same
-   RATE))                                                                                                                                 ; the rate become ten
+   RATE))                                                                                                                               ; the rate is the same
 
 
 ;;;;;;;;;; HANDLE KEYBOARD ;;;;;;;;;;
@@ -560,7 +561,9 @@
 
 ; Code
 (define (handle-keyboard state key)
-  (cond    
+  (cond
+    [(not (string? key)) state]                                                                          ; if the key is a no string input retunr the same appstate as before
+    
     [(string=? key "s") (start state)]                                                                   ; start the game
     
     [(or (and (string=? key "up") (string=? (snake-direction (appstate-snake state)) "down"))            ; if the direction is opposite of the key, the state is the same
@@ -602,18 +605,17 @@
 (define (eating state)
   (begin (play-sound EATEN #true)
          (make-appstate                                                                                                                                      ; create a new appstate where :
-          (move-snake                                                                                                                                          ; the snake moves
-           (make-snake                                                                                                                                         ; and it is composed by:
-            (cons (first (snake-position (appstate-snake state))) (snake-position (appstate-snake state)))                                                       ; both position of previous snake and apple
-            (add1 (snake-length (appstate-snake state)))                                                                                                         ; the snake's length is greater than one
-            (snake-direction (appstate-snake state))))                                                                                                           ; the snake's direction is the same
+          (move-snake (make-snake                                                                                                                              ; the snake moves is composed by:
+                       (cons (first (snake-position (appstate-snake state))) (snake-position (appstate-snake state)))                                            ; both position of previous snake and apple
+                       (add1 (snake-length (appstate-snake state)))                                                                                              ; the snake's length is greater than one
+                       (snake-direction (appstate-snake state))))                                                                                                ; the snake's direction is the same
           (compute-apple-position (random 401) 1 (compute-available-pos (cons (appstate-apple state) (snake-position (appstate-snake state))) BACKGROUNDPOS))  ; the apple's position is changed
           (appstate-game state)                                                                                                                                ; the game's appstate is the same
           (appstate-quit state)                                                                                                                                ; the game's appstate is the same
           (appstate-tick state)                                                                                                                                ; the game's appstate is the same
           (if (and (> (sub1 (appstate-rate state)) 0) (= 0 (remainder (- 3 (snake-length (appstate-snake state))) 3)))                                         ; then check whether to increase the speed :
-              (sub1 (appstate-rate state))                                                                                                                          ; the rate is less than one
-              (appstate-rate state)))))                                                                                                                             ; the rate's appstate is the same
+              (sub1 (appstate-rate state))                                                                                                                       ; the rate is less than one
+              (appstate-rate state)))))                                                                                                                          ; the rate's appstate is the same
 
 
 ;;;;;;;;;; MOVE ;;;;;;;;;;
@@ -624,14 +626,16 @@
 ; Code
 (define (move state)
   (cond
-    [(end? state) (make-appstate                                                                               ; giving an appstate as before where :
-                   (appstate-snake state)                                                                        ; the snaek's state is the same
-                   (appstate-apple state)                                                                        ; the apple's state is the same
-                   #false                                                                                        ; the game is false
-                   #false                                                                                        ; the quit is false
-                   (appstate-tick state)                                                                         ; the tick's state is the same
-                   (appstate-rate state))]                                                                       ; the rate's state is the same
-    [(not (appstate-game state)) state]                                                                        ; if the game is off, the snake must not move
+    [(end? state) (make-appstate                                                                       ; giving an appstate as before where :
+                   (appstate-snake state)                                                                ; the snaek's state is the same
+                   (appstate-apple state)                                                                ; the apple's state is the same
+                   #false                                                                                ; the game is false
+                   #false                                                                                ; the quit is false
+                   (appstate-tick state)                                                                 ; the tick's state is the same
+                   (appstate-rate state))]                                                               ; the rate's state is the same
+
+    [(not (appstate-game state)) state]                                                                ; if the game is off, the snake must not move
+
     [(= (remainder (appstate-tick state) (appstate-rate state)) 0)
      (cond
        [(equal? (last (snake-position (appstate-snake state))) (appstate-apple state)) (eating state)] ; if the snake is eating call the function to upgrade both its length and apple's position
@@ -642,6 +646,7 @@
                (appstate-quit state)                                                                     ; the quit's state is the same
                (add1 (appstate-tick state))                                                              ; the tick's state is greater than one
                (appstate-rate state))])]                                                                 ; the rate's state is the same
+
     [else (make-appstate                                                                               ; otherwise give the same appstate as before but add 1 to tick
            (appstate-snake state)
            (appstate-apple state)
