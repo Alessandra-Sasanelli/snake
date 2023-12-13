@@ -46,7 +46,7 @@
 		\item \textbf{make-positions}: \\
 			\emph{signature}: Number Number Number List$<$Posn$>$ -$>$ List$<$Posn$>$ \\
 			\emph{purpose}: computes all the positions on the background before the game starts \\
-			\emph{explanation}: this function takes in 4 inputs. The first one, n, represents the positions from which we are starting to compute all of the other positions, x and y represents the row and column from which we are starting, then the list represents a list with all the positions already present. To compute all the positions for a background with 501*501 dimensions, and, considering that every position takes 25*25 pixels of area, you must insert pass as parameters 1, 1, 1 (list (make-posn 13 13)), and this recursion must stop at 400, which is the max number of positions available, given the background dimensions. This is why the base case for this function is when n is equal to 400. For every other case, we first check whether the row has all been filled up; this means that we need to increment n and to change row, incrementing y by one. Otherwise, we need to increment n by one and x by one to change column. The posn will be created based on the column and the row and it will be added to the list of positions.
+			\emph{explanation}: this function has four parameters: `n` (the starting position count), `x` and `y` (initial row and column), and a list of existing positions. To map positions on a 501x501 pixel background, where each position spans 25x25 pixels, use parameters 1, 1, 1, and `(list (make-posn 13 13))`. The recursion halts at `n = 400`, the maximum positions possible on this background, marking the base case. If a row is filled, increase `n` and `y` to move to the next row. Otherwise, increment `n` and `x` for the next column. Each position, determined by row and column, is added to the positions list.
 			\begin{figure}[h!]
 				\centering
 				\includegraphics[width=.6\linewidth]{make-position.png}
@@ -56,7 +56,7 @@
 		\item \textbf{compute-available-pos}: \\
 			\emph{signature}: List$<$Posn$>$ List$<$Posn$>$ -$>$ List$<$Posn$>$ \\
 			\emph{purpose}: computes available positions on the background \\
-			\emph{explanation}: this function needs to do recursion over two lists, the lop-snake which represents the positions of the snake 							to be eliminated from the available positions, the lop list. The base case checks whether one or both of the 							two lists are empty. In this case, all the positions have been checked and none of them is occupied, 									therefore, we return lop. Else, we call the function on the rest of the lop-snake and delete-el over the first of 							the lop-snake and on the lop function. This function returns either lop as it is, or it eliminates one element 								from it if it is equal to first of lop-snake. 
+			\emph{explanation}: this function performs recursion over two lists: `lop-snake`, which holds positions of the snake to be removed from the available positions in `lop`. The base case occurs when either or both lists are empty, indicating all positions have been evaluated and are unoccupied, so `lop` is returned. Otherwise, the function recursively processes the remainder of `lop-snake` and applies `delete-el` to the first element of `lop-snake` and the `lop` list. The `delete-el` function either retains `lop` as is or removes an element from it if it matches the first element of `lop-snake`.
 			\begin{figure}[h!]
 				\centering
 				\includegraphics[width=.6\linewidth]{compute-available-pos.png}
@@ -66,7 +66,7 @@
 		\item \textbf{compute-apple-position}: \\
 			\emph{signature}: Number Number List$<$Posn$>$ -$>$ Apple \\
 			\emph{purpose}: computes all the positions on the background before the game starts \\
-			\emph{explanation}: this function uses three parameters, one of which is an accumulator. The n represent a number which must be between 1(included) and 401(excluded). This number represent which position from the available positions to choose. The base case checks if the rest is empty or if the n is equal to the accumulator (which means that ). This condition returns the first element. Else, we call recursively the function over the rest of the list and we increase by one the accumulator. 
+			\emph{explanation}: this function has three parameters, including an accumulator. It selects a position from available positions using `n`, which ranges from 1 (inclusive) to 401 (exclusive). The base case triggers if the list is empty or `n` equals the accumulator, returning the first element. Otherwise, it recurses over the rest of the list, incrementing the accumulator by one.
 			\begin{figure}[h!]
 				\centering
 				\includegraphics[width=.6\linewidth]{compute-apple-position.png}
@@ -88,8 +88,7 @@
 		\item \textbf{update-positions}: \\
 			\emph{signature}: Direction List$<$Posn$>$ -$>$ List$<$Posn$>$ \\
 			\emph{purpose}: updates a list of positions based on itself and the head direction \\
-			\emph{explanation}: this function takes a list of posn and returns a new list of posn. The new posn will be updated based on a 							direction. 
-							The base case for this function happens when the rest of the list is empty. This means that the only 									element that the only posn that is left to be updated is the head. This posn will follow the direction field 								given in the snake struct. The recursive case constructs a list applying to the first element of the list the 								function "compute-new-posn", wich simply returns a new posn based on the direction passed to the 									function. The direction for a single posn is given by itself and the next posn present into the list.
+			\emph{explanation}: this function processes a list of `posn` and outputs a new list with updated `posn` based on a given direction. The base case occurs when only one `posn` remains in the list, which is then updated according to the `direction` field in the `snake` structure. In the recursive case, the function constructs a list by applying `compute-new-posn` to the first list element. This function generates a new `posn` based on the direction determined by both the current and next `posn` in the list.
 			\begin{figure}[h!]
 				\centering
 				\includegraphics[width=.6\linewidth]{update-positions.png}
@@ -105,7 +104,7 @@
 		\item \textbf{draw-snake}: \\
 			\emph{signature}: Snake -$>$ Image \\
 			\emph{purpose}: draws the snake on the background \\
-			\emph{explanation}: since the snake is graphically made of three basic elements, which are the head, the tail and the snakeunit, we need three conditions to be applied in our recursion. The base case happens when the rest of the list is empty; this means that the only element to be drawn is the head of the snake, so, we place the head over the background at the position specified. The head needs also to be rotated based on its direction, that's why we call rotate-el on it. Then, the second condition happens when the length of the list is equal to the length of the snake; this means that the element to be drawn is the tail of the snake. Rotate-el is applied to the tail too, but the direction of the tail is now given by itself and the next element after it. The recursive case calls the place-image on the first element of the list, drawing a snakeunit at specified position over the result of the recursive call applied to the rest of the list.  
+			\emph{explanation}: in this function for drawing a snake in the graphical interface, different conditions are applied in recursion to handle the head, tail, and body units of the snake. The base case occurs when there's only one element left in the list, indicating the head of the snake, which is then placed and rotated on the background based on its direction using `rotate-el`. When the list's length is equal to the snake's length, the function identifies it as the tail to be drawn, applying `rotate-el` for rotation, with its direction influenced by the tail itself and the subsequent element. In the recursive case, `place-image` is used for the first element of the list, drawing a snake unit at the specified position. This process is repeated for the remaining list, thereby drawing each body unit of the snake.
 			\begin{figure}[h!]
 				\centering
 				\includegraphics[width=.6\linewidth]{draw-snake.png}
@@ -145,7 +144,7 @@
 		\item \textbf{eating}: \\
 			\emph{signature}: AppState -$>$ AppState \\
 			\emph{purpose}: handles the eating event of the game \\
-			\emph{explanation}: the first operation the function does, is playing the sound when it gets called. Then, it comes the main part of the function: an appstate gets created with a new snake on which gets called the before described move-snake. This snake, though, has a new position added to the snake-position field, and the length gets incremented by one. Then, the apple changes; its position gets computed by the compute-apple-pos, passing a list containing the snake positions and the previous apple position, and all the positions on the background. The last field that is different from before is the rate field, which gets decremented by one only if three apples have been eaten.
+			\emph{explanation}: when the function is called, it first plays a sound. The main operation involves creating a new `appstate` with an updated snake, which is moved using `move-snake`. This updated snake has a new position added to its `snake-position` field, and its length is increased by one. Next, the apple's position is recalculated using `compute-apple-pos`, which takes a list of snake positions, the previous apple position, and all background positions. Finally, the `rate` field is reduced by one only after three apples have been eaten.
 			\begin{figure}[h!]
 				\centering
 				\includegraphics[width=.6\linewidth]{eating.png}
@@ -155,7 +154,7 @@
 		\item \textbf{move}: \\
 			\emph{signature}: AppState -$>$ AppState \\
 			\emph{purpose}: used to change the appstate on tick \\
-			\emph{explanation}: if on tick, it results that the end condition is meet, the game and quit fields get switched to false. Then, if the appstate game is false, the function simply returns the same appstate as before. Then, we check for the remainder between tick and rate. Tick represents the number of times the clock ticked from the beginning, while the rate represents the speed levels. If the remainder is zero, we update the appstate, either by simply calling move-snake on the snake, or by calling the eating function. Thanks to this method, as the rate gets smaller, the snake gets faster. If none of the conditions named before are not met, the appstate gets returned as before but incrementing by one the tick field.
+			\emph{explanation}: if the end condition is met on tick, the game and quit fields are set to false. If `appstate` game is false, the function returns the unchanged `appstate`. The function then checks the remainder of tick divided by rate, with tick counting clock ticks since start and rate indicating speed levels. If the remainder is zero, `appstate` is updated either by moving the snake or calling the eating function, making the snake faster as rate decreases. If none of these conditions are met, `appstate` is returned with the tick field incremented by one.
 			\begin{figure}[h!]
 				\centering
 				\includegraphics[width=.6\linewidth]{move.png}
