@@ -11,7 +11,7 @@
 (require "external-files/snake.rkt")
 (require "external-files/positions.rkt")
 (require "external-files/generals.rkt")
-
+CIAONE PROPRIO
 
 ;;;;;;;;;;;;;;;;;;;; DATA TYPES ;;;;;;;;;;;;;;;;;;;;
 

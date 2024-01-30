@@ -49,7 +49,7 @@
 (define TICK 0)
 
 ; speed levels
-(define RATE 8)
+(define RATE 4)
 
 ; GAMEOVRPLAYED: Boolean
 ; represents weather the game-over mp3 has been played or not
@@ -597,7 +597,7 @@
 ;;;;;;;;;; EATING ;;;;;;;;;;
 ; eating : AppState -> AppState
 ; when the apple is eaten by the snake,
-; it will become more longer and the apple's position will update
+; it will become longer and the apple's position will update
 ; It will also play the eaten sound
 ; Header (define (eating DEFAULT) DEFAULT)
 
@@ -606,14 +606,22 @@
   (begin (play-sound EATEN #true)
          (make-appstate                                                                                                                                      ; create a new appstate where :
           (move-snake (make-snake                                                                                                                              ; the snake moves is composed by:
-                       (cons (first (snake-position (appstate-snake state))) (snake-position (appstate-snake state)))                                            ; both position of previous snake and apple
+                       (cons
+                        (first (snake-position (appstate-snake state)))
+                        (snake-position (appstate-snake state)))                                            ; both position of previous snake and apple
                        (add1 (snake-length (appstate-snake state)))                                                                                              ; the snake's length is greater than one
                        (snake-direction (appstate-snake state))))                                                                                                ; the snake's direction is the same
-          (compute-apple-position (random 401) 1 (compute-available-pos (cons (appstate-apple state) (snake-position (appstate-snake state))) BACKGROUNDPOS))  ; the apple's position is changed
+          (compute-apple-position
+           (random 401) 1 (compute-available-pos
+                           (cons
+                            (appstate-apple state)
+                            (snake-position (appstate-snake state))) BACKGROUNDPOS))  ; the apple's position is changed
           (appstate-game state)                                                                                                                                ; the game's appstate is the same
           (appstate-quit state)                                                                                                                                ; the game's appstate is the same
           (appstate-tick state)                                                                                                                                ; the game's appstate is the same
-          (if (and (> (sub1 (appstate-rate state)) 0) (= 0 (remainder (- 3 (snake-length (appstate-snake state))) 3)))                                         ; then check whether to increase the speed :
+          (if (and
+               (> (sub1 (appstate-rate state)) 0)
+               (= 0 (remainder (- 3 (snake-length (appstate-snake state))) 3)))                                         ; then check whether to increase the speed :
               (sub1 (appstate-rate state))                                                                                                                       ; the rate is less than one
               (appstate-rate state)))))                                                                                                                          ; the rate's appstate is the same
 
@@ -679,5 +687,6 @@
     [name "Snake Game"]         ; give a name to the game's display
     [close-on-stop #true]       ; close the window when the application closes
     [stop-when quit]))          ; quit the application
+
 
 (snake-game DEFAULT)

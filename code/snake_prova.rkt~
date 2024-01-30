@@ -619,7 +619,7 @@
 
 ; Code
 (define (move state)
-  (cond                                                                                                        ; if the game is off, the snake must not move
+  (cond
     [(end? state) (make-appstate                                                                               ; giving an appstate as before where :
                    (appstate-snake state)                                                                        ; the snaek's state is the same
                    (appstate-apple state)                                                                        ; the apple's state is the same
@@ -627,7 +627,7 @@
                    #false                                                                                        ; the quit is false
                    (appstate-tick state)                                                                         ; the tick's state is the same
                    (appstate-rate state))]                                                                       ; the rate's state is the same
-    [(not (appstate-game state)) state]                                                                        ; 
+    [(not (appstate-game state)) state]                                                                        ; if the game is off, the snake must not move
     [(= (remainder (appstate-tick state) (appstate-rate state)) 0)
      (cond
        [(equal? (last (snake-position (appstate-snake state))) (appstate-apple state)) (eating state)] ; if the snake is eating call the function to upgrade both its length and apple's position
